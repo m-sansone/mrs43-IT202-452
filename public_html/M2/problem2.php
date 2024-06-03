@@ -15,8 +15,8 @@ function getTotal($arr) {
     }
 
     //TODO do rounding stuff here (round to two decimals i.e., 0.10, 0.01, 0.00)
-    $total = round($total, 2);
-    number_format((float) $total, 2);
+    $total = number_format((float) $total, 2);
+    
     //end edits
     echo "The total is $total";
 }
