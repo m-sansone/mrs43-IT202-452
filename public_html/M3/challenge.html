@@ -13,13 +13,62 @@
             setTimeout(() => {
                 //added this delay here as some solutions may require it to update properly (i.e., click code may complete before the navigation changes)
                 //TODO: add code for processing the current selection 
-
+                var currentClickedLinkText = link.innerText;
+                updateCurrentPage(currentClickedLinkText);
                 //Note: likely you'll want to call updateCurrentPage towards the end
             }, 100);
         }
     </script>
     <style>
         /* TODO: make edits here */
+        /* Make the navigation horizontal */
+        nav ul li{
+            display: inline-block;
+            
+        }
+
+        /* Get rid of navigation list item markers */
+        nav ul li:before{
+            content:'';
+        }
+
+        /* Give navigation a background */
+        nav{
+            background-color:black;
+        }
+
+        /* Make links change color on hover */
+        ul a:hover{
+            color:paleturquoise;
+        }
+
+        /* Change bullet points to checkmarks */
+        li{
+            list-style-type: none;
+        }
+
+        ul li:before{
+            content:'✓';
+        }
+
+        /* Uppercase first character of <h1> and <a> tags */
+        ul li a{
+            display: inline-block;
+        }
+
+        h1:first-letter{
+            text-transform: uppercase;
+        }
+
+        a:first-letter{
+            text-transform: uppercase;
+        }
+
+        /* styling of my choice*/
+        a {
+            color: white;
+        }
+        
     </style>
     <!-- make the necessary edits above this line -->
 
