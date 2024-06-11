@@ -14,8 +14,9 @@
                 //added this delay here as some solutions may require it to update properly (i.e., click code may complete before the navigation changes)
                 //TODO: add code for processing the current selection 
                 var currentClickedLinkText = link.innerText;
+                document.querySelector("h1").innerText = currentClickedLinkText;
+                document.querySelector("title").innerText = currentClickedLinkText;
                 updateCurrentPage(currentClickedLinkText);
-                document.title = dynamicContent;
                 //Note: likely you'll want to call updateCurrentPage towards the end
             }, 100);
         }
