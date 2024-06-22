@@ -1,3 +1,6 @@
+<?php
+require_once(__DIR__ . "/../../lib/functions.php");
+?>
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email</label>
@@ -24,36 +27,28 @@
         let password = form.password.value;
         let confirm = form.confirm.value;
 
-        if(!email){//checking if empty
-            flash("Email must not be empty","warning");
+        if(!email){
             isValid = false;
         }
         if(!isValidEmail(email)){
-            flash("Invalid email address", "warning");
             isValid = false;
         }
-        if(!username){//Checking if empty this might need to be applied server-side as well
-            flash("Username must not be empty","warning");
+        if(!username){
             isValid = false;
         }
         if(!isValidUsername(username)){
-            flash("Username must only contain 3-16 characters a-z, 0-9, _, or -","warning");
             isValid = false;
         }
-        if(!password){//checking if empty
-            flash("Password must not be empty","warning");
+        if(!password){
             isValid = false;
         }
-        if(!confirm){//checking if empty
-            flash("Confirm password must not be empty","warning");
+        if(!confirm){
             isValid = false;
         }
         if(!isValidPassword(password)){
-            flash("Password must be a minimum of eight characters", "warning");
             isValid = false;
         }
         if(password && !isEqual(password,confirm)){
-            flash("Passwords must match", "warning");
             isValid = false;
         }
 
@@ -62,11 +57,50 @@
 </script>
 <?php
  //TODO 2: add PHP Code
- if(isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm"])){
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $confirm = $_POST["confirm"];
-    //TODO 3: validate/use
-    
+ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm"])) {
+    $email = se($_POST, "email", "", false);
+    $password = se($_POST, "password", "", false);
+    $confirm = se($_POST, "confirm", "", false);
+    $hasError = false;
+    if (empty($email)) {
+        echo "Email must not be empty";
+        $hasError = true;
+    }
+    //sanitize
+    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "Invalid email";
+        $hasError = true;
+    }
+    if (empty($password)) {
+        echo "Password must not be empty";
+        $hasError = true;
+    }
+    if (empty($confirm)) {
+        echo "Confirm Password must not be empty";
+        $hasError = true;
+    }
+    if (strlen($password) < 8) {
+        echo "Password must be >8 characters";
+        $hasError = true;
+    }
+    if (strlen($password) > 0 && $password !== $confirm) {
+        echo "Passwords must match";
+        $hasError = true;
+    }
+    if (!$hasError) {
+        //TODO 4
+        //echo "Welcome, $email";
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $db = getDB();
+        $stmt = $db->prepare("INSERT INTO Users (email, password) VALUES(:email, :password)");
+        try {
+            $stmt->execute([":email" => $email, ":password" => $hash]);
+            echo "Successfully registered!";
+        } catch (Exception $e) {
+            echo "There was a problem registering";
+            echo "<pre>" . var_export($e, true) . "</pre>";
+        }
+    }
  }
 ?>
