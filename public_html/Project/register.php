@@ -67,13 +67,19 @@ require_once(__DIR__ . "/../../partials/nav.php");
         $hasError = true;
     }
     //sanitize
-    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "Invalid email";
+    //$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+    $email = sanitize_email($email);
+    //validate
+    /*if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "Please enter a valid email <br>";
+        $hasError = true;
+    }*/
+    if(!is_valid_email($email)){
+        echo "Please enter a valid email <br>";
         $hasError = true;
     }
     if (empty($password)) {
-        echo "Password must not be empty";
+        echo "Password must be provided <br>";
         $hasError = true;
     }
     if (empty($confirm)) {
