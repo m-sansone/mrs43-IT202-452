@@ -29,7 +29,24 @@ function processCars($cars) {
     $processedCars = []; // result array
     $classic_age = 25; // don't change this value
     // Start edits
-   
+    $isClassic = false;
+    foreach($cars as $car){
+        foreach($car as $key => $value){
+            if($key == "year"){
+                $currentYear = date("Y");
+                $age = $currentYear - $value;
+                $car["age"] = $age;
+                if($age >= $classic_age){
+                    $car["isClassic"] = true;
+                } else{
+                    $car["isClassic"] = false;
+                }
+            }
+
+        }
+        $processedCars[] = $car;
+    }
+
     // End edits
     echo "<pre>" . var_export($processedCars, true) . "</pre>";
     
