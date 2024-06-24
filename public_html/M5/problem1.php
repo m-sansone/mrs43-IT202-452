@@ -27,6 +27,7 @@ function processBirds($birds) {
     // TODO add logic here to create a new array with only name, color, and region
     $subset = []; // result array
     // Start edits
+    //mrs43 6-24-2024
     foreach($birds as $bird){
         foreach($bird as $key => $value){
             if($key == "name" or $key == "color" or $key == "region"){
