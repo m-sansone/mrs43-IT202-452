@@ -42,7 +42,6 @@ function processCars($cars) {
                     $car["isClassic"] = false;
                 }
             }
-
         }
         $processedCars[] = $car;
     }

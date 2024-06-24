@@ -30,9 +30,12 @@ function processBirds($birds) {
     foreach($birds as $bird){
         foreach($bird as $key => $value){
             if($key == "name" or $key == "color" or $key == "region"){
-                $subset[] = $value;
+                $bird[$key] = $value;
+            } else {
+                unset($bird[$key]);
             }
         }
+        $subset[] = $bird;
     }
     // End edits
     echo "<pre>" . var_export($subset, true) . "</pre>";
