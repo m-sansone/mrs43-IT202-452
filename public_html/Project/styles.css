@@ -1,0 +1,27 @@
+.alert-success {
+    background-color: green
+}
+
+.alert-warning {
+    background-color: yellow;
+}
+
+.alert-danger {
+    background-color: red;
+}
+
+.alert-info {
+    background-color: teal;
+}
+nav li{display: inline}
+nav{background-color: black; text-align: center; padding:0.25px}
+ul a:hover{
+    color:cyan
+}
+nav li a{color: darkcyan}
+input{border-radius: 10%;}
+body{
+    background-color: darkcyan;
+    color: darkslategrey;
+
+}
