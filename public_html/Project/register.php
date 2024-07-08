@@ -33,27 +33,35 @@ reset_session();
 
         if(!email){
             isValid = false;
+            flash("An email is required", "warning");
         }
         if(!isValidEmail(email)){
             isValid = false;
+            flash("The email entered is invalid", "warning");
         }
         if(!username){
             isValid = false;
+            flash("A username is required", "warning");
         }
         if(!isValidUsername(username)){
             isValid = false;
+            flash("The username entered is invalid", "warning");
         }
         if(!password){
             isValid = false;
+            flash("A password is required", "warning");
         }
         if(!confirm){
             isValid = false;
+            flash("Please re-enter your password", "warning");
         }
         if(!isValidPassword(password)){
             isValid = false;
+            flash("The password entered is invalid", "warning");
         }
         if(password && !isEqual(password,confirm)){
             isValid = false;
+            flash("The passwords must match", "warning");
         }
 
         return true;
