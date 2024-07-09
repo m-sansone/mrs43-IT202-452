@@ -35,7 +35,7 @@ reset_session();
             isValid = false;
             flash("An email is required", "warning");
         }
-        if(!isValidEmail(email)){
+        if(!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)){
             isValid = false;
             flash("The email entered is invalid", "warning");
         }
@@ -43,7 +43,7 @@ reset_session();
             isValid = false;
             flash("A username is required", "warning");
         }
-        if(!isValidUsername(username)){
+        if(!/^[a-z0-9_-]{3,16}$/.test(username)){
             isValid = false;
             flash("The username entered is invalid", "warning");
         }
@@ -55,7 +55,7 @@ reset_session();
             isValid = false;
             flash("Please re-enter your password", "warning");
         }
-        if(!isValidPassword(password)){
+        if(!password.length() < 8){
             isValid = false;
             flash("The password entered is invalid", "warning");
         }
@@ -76,15 +76,19 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
     $username = se($_POST, "username", "", false);
     //TODO 3
     $hasError = false;
-    if (empty($email)) {
-        flash("Email must not be empty", "danger");
-        $hasError = true;
-    }
     //sanitize
     $email = sanitize_email($email);
     //validate
+    if (empty($email)) {
+        flash("email must not be empty", "danger");
+        $hasError = true;
+    }
     if (!is_valid_email($email)) {
         flash("Invalid email address", "danger");
+        $hasError = true;
+    }
+    if (empty($username)) {
+        flash("username must not be empty", "danger");
         $hasError = true;
     }
     if (!is_valid_username($username)) {
