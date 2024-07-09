@@ -76,10 +76,6 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
     $username = se($_POST, "username", "", false);
     //TODO 3
     $hasError = false;
-    if (empty($email)) {
-        flash("Email must not be empty", "danger");
-        $hasError = true;
-    }
     //sanitize
     $email = sanitize_email($email);
     //validate

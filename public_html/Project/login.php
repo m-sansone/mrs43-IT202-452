@@ -68,21 +68,21 @@ require(__DIR__ . "/../../partials/nav.php");
         $email = sanitize_email($email);
         //validate
         if(!is_valid_email($email)){
-            flash("Please enter a valid email <br>");
+            flash("Please enter a valid email");
             $hasError = true;
         }
     } else{
         if(!is_valid_username($email)){
-            flash("Please enter a valid username <br>");
+            flash("Please enter a valid username");
             $hasError = true;
         }
     }
     if (empty($password)) {
-        flash("Password must be provided <br>");
+        flash("Password must be provided");
         $hasError = true;
     }
     if (strlen($password) < 8) {
-        flash("Password must be at least 8 characters long <br>");
+        flash("Password must be at least 8 characters long");
         $hasError = true;
     }
     
