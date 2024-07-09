@@ -1,4 +1,5 @@
 <?php
+//mrs43 7-8-2024
 require(__DIR__ . "/../../partials/nav.php");
 ?>
 <form onsubmit="return validate(this)" method="POST">
@@ -14,6 +15,7 @@ require(__DIR__ . "/../../partials/nav.php");
 </form>
 <script>
     function validate(form) {
+        //mrs43 7-8-2024
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
         let isValid = true;
@@ -21,7 +23,6 @@ require(__DIR__ . "/../../partials/nav.php");
         let email = form.email.value;
         let username = form.username.value;
         let password = form.password.value;
-        let confirm = form.confirm.value;
 
         if(!email){
             isValid = false;
@@ -38,13 +39,7 @@ require(__DIR__ . "/../../partials/nav.php");
         if(!password){
             isValid = false;
         }
-        if(!confirm){
-            isValid = false;
-        }
         if(!isValidPassword(password)){
-            isValid = false;
-        }
-        if(password && !isEqual(password,confirm)){
             isValid = false;
         }
 
