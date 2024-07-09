@@ -8,41 +8,31 @@ require(__DIR__ . "/../../partials/nav.php");
     </div>
     <div>
         <label for="pw">Password</label>
-        <input type="password" id="pw" name="password" required minlength="8" />
+        <input type="password" id="pw" name="password" required minlength="0" />
     </div>
     <input type="submit" value="Login" />
 </form>
 <script>
     function validate(form) {
+        //mrs43 7-8-2024
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
         let isValid = true;
-        
         let email = form.email.value;
-        let username = form.username.value;
         let password = form.password.value;
 
-        if(!email){
-            isValid = false;
+        if(!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)){
+            if(!/^[a-z0-9_-]{3,16}$/.test(email)){    
+                isValid = false;
+                flash("Invalid username or email", "warning");
+            }
         }
-        if(!isValidEmail(email)){
+        if(password.length() < 1){
             isValid = false;
-        }
-        if(!username){
-            isValid = false;
-        }
-        if(!isValidUsername(username)){
-            isValid = false;
-        }
-        if(!password){
-            isValid = false;
-        }
-        if(!isValidPassword(password)){
-            isValid = false;
+            flash("Please enter a password", "warning");
         }
 
-
-        return true;
+        return isValid;
     }
 </script>
 <?php
@@ -75,7 +65,7 @@ require(__DIR__ . "/../../partials/nav.php");
         flash("Password must be provided");
         $hasError = true;
     }
-    if (strlen($password) < 8) {
+    if (strlen($password) < 0) {
         flash("Password must be at least 8 characters long");
         $hasError = true;
     }

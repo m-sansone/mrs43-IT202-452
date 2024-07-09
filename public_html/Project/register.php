@@ -35,7 +35,7 @@ reset_session();
             isValid = false;
             flash("An email is required", "warning");
         }
-        if(!isValidEmail(email)){
+        if(!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email)){
             isValid = false;
             flash("The email entered is invalid", "warning");
         }
@@ -43,7 +43,7 @@ reset_session();
             isValid = false;
             flash("A username is required", "warning");
         }
-        if(!isValidUsername(username)){
+        if(!/^[a-z0-9_-]{3,16}$/.test(username)){
             isValid = false;
             flash("The username entered is invalid", "warning");
         }
@@ -55,7 +55,7 @@ reset_session();
             isValid = false;
             flash("Please re-enter your password", "warning");
         }
-        if(!isValidPassword(password)){
+        if(!password.length() < 8){
             isValid = false;
             flash("The password entered is invalid", "warning");
         }
