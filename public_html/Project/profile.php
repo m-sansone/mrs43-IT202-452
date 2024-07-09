@@ -118,35 +118,25 @@ $username = get_username();
         let isValid = true;
         //TODO add other client side validation....
         let email = form.email.value;
-        let current = form.currentPassword.value;
-        //let newPassword = form.newPassword.value;
-        //let confirm = form.confirmPassword.value;
         let username = form.username.value;
-
-        if(!isValidEmail(email)){
-            flash("Invalid email address","warning");
+        if(pw.length < 8){
+            flash("Password must be at least 8 characters", "warning");
             isValid = false;
         }
-        if(current && !isValidPassword(current)){
-            flash("Current password is invalid","info");
+        if(!email.match(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)){
             isValid = false;
+            flash("Email is invalid", "warning");
+           
         }
-        if(pw && !isValidPassword(pw)){
-            flash("New password must be a minimum of eight characters", "warning");
+        if(!username.match(/^[a-z0-9_-]{3,16}$/)){
             isValid = false;
-        }
-        if(confirm && !isEqual(pw,con)){
-            flash("New passwords must match","warning");
-            isValid = false;
-        }
-        if(!isValidUsername(username)){
             flash("Username must only contain 3-16 characters a-z, 0-9, _, or -","warning");
-            isValid = false;
+           
         }
         //example of using flash via javascript
         //find the flash container, create a new element, appendChild
         if (pw !== con) {
-            flash("Password and Confirm must match", "warning");
+            flash("Password and Confrim password must match", "warning");
             isValid = false;
         }
         return isValid;
