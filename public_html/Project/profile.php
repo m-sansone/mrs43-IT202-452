@@ -119,17 +119,16 @@ $username = get_username();
         //TODO add other client side validation....
         let email = form.email.value;
         let username = form.username.value;
-        console.log("hi there");
-        if(pw.length() < 8){
+        if(pw.length < 8){
             flash("Password must be at least 8 characters", "warning");
             isValid = false;
         }
-        if(!email.test(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)){
+        if(!email.match(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)){
             isValid = false;
             flash("Email is invalid", "warning");
            
         }
-        if(!username.test(/^[a-z0-9_-]{3,16}$/)){
+        if(!username.match(/^[a-z0-9_-]{3,16}$/)){
             isValid = false;
             flash("Username must only contain 3-16 characters a-z, 0-9, _, or -","warning");
            
