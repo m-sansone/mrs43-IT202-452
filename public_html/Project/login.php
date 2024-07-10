@@ -8,7 +8,7 @@ require(__DIR__ . "/../../partials/nav.php");
     </div>
     <div>
         <label for="pw">Password</label>
-        <input type="password" id="pw" name="password" required minlength="0" />
+        <input type="password" id="pw" name="password" required minlength="8" />
     </div>
     <input type="submit" value="Login" />
 </form>
@@ -65,7 +65,7 @@ require(__DIR__ . "/../../partials/nav.php");
         flash("Password must be provided");
         $hasError = true;
     }
-    if (strlen($password) < 0) {
+    if (strlen($password) < 8) {
         flash("Password must be at least 8 characters long");
         $hasError = true;
     }
