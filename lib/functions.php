@@ -27,4 +27,6 @@ require(__DIR__ . "/get_url.php");
 //help with bootstrap
 require(__DIR__ . "/render_functions.php");
 
+require(__DIR__ . "/api_helper.php");
+
 ?>
