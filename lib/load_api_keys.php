@@ -1,6 +1,6 @@
 <?php
 // string array containing env keys to lookup (this allows usage of multiple APIs)
-$env_keys = ["STOCK_API_KEY"];
+$env_keys = ["RECIPE_API_KEY"];
 $ini = @parse_ini_file(".env");
 
 $API_KEYS = [];
@@ -15,7 +15,7 @@ foreach ($env_keys as $key) {
         $API_KEYS[$key] = $API_KEY;
     }
     if (!isset($API_KEYS[$key]) || !$API_KEYS[$key]) {
-        error_log("Faild to load api key for env key $key");
+        error_log("Failed to load api key for env key $key");
     }
     unset($API_KEY);
 }
