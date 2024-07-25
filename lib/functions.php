@@ -16,7 +16,6 @@ require(__DIR__ . "/sanitizers.php");
 //TODO 3: User helpers
 require(__DIR__ . "/user_helpers.php");
 
-
 //duplicate email/username
 require(__DIR__ . "/duplicate_user_details.php");
 //reset session
@@ -27,6 +26,6 @@ require(__DIR__ . "/get_url.php");
 //help with bootstrap
 require(__DIR__ . "/render_functions.php");
 
+//help with api
 require(__DIR__ . "/api_helper.php");
-
-?>
+require(__DIR__ . "/book_api.php");

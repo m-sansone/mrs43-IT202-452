@@ -2,13 +2,13 @@
 require(__DIR__ . "/../../partials/nav.php");
 
 $result = [];
-if (isset($_GET["symbol"])) {
+if (isset($_GET["title"])) {
     //function=GLOBAL_QUOTE&symbol=MSFT&datatype=json
-    $data = ["q" => "sandwich","type" => "public", "beta" => "true", "random" => "True"];
-    $endpoint = "https://edamam-recipe-search.p.rapidapi.com/api/recipes/v2";
+    $data = ["title" => "fire"];
+    $endpoint = "https://book-finder1.p.rapidapi.com/api/search";
     $isRapidAPI = true;
-    $rapidAPIHost = "edamam-recipe-search.p.rapidapi.com";
-    $result = get($endpoint, "RECIPE_API_KEY", $data, $isRapidAPI, $rapidAPIHost);
+    $rapidAPIHost = "book-finder1.p.rapidapi.com";
+    $result = get($endpoint, "BOOK_API_KEY", $data, $isRapidAPI, $rapidAPIHost);
     //example of cached data to save the quotas, don't forget to comment out the get() if using the cached data for testing
     /* $result = ["status" => 200, "response" => '{
     "Global Quote": {
@@ -32,7 +32,7 @@ if (isset($_GET["symbol"])) {
     }
 }
 
-$quote = $result["sandwich"];
+/*$quote = $result["sandwich"];
 $quote = array_reduce(
     array_keys($quote),
     function($temp, $key) use ($quote){
@@ -44,7 +44,7 @@ $quote = array_reduce(
 $result = [$quote];
 
 $db = getDB();
-$query = "INSERT INTO `IT202_S24_RECIPES` ";
+$query = "INSERT INTO `IT202_S24_BOOKS` ";
 $columns = [];
 $params = [];
 //per record
@@ -56,7 +56,7 @@ $query .= "(" . join(",", $columns) . ")";
 $query .= "VALUES (" . join(",", array_keys($params)) . ")";
 
 $db->prepare();
-
+*/
 ?>
 <div class="container-fluid">
     <h1>Stock Info</h1>
@@ -64,7 +64,7 @@ $db->prepare();
     <form>
         <div>
             <label>Symbol</label>
-            <input name="symbol" />
+            <input name="title" />
             <input type="submit" value="Fetch Stock" />
         </div>
     </form>
