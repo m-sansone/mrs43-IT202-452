@@ -76,7 +76,6 @@ if ($book) {
         ["type" => "text", "name" => "series_name", "placeholder" => "Series", "label" => "Series"],
         ["type" => "text", "name" => "language", "placeholder" => "Language", "label" => "Language", "rules"=> ["required" => "required"]],
         ["type" => "text", "name" => "summary", "placeholder" => "Summary", "label" => "Summary", "rules"=> ["required" => "required"]],
-
     ];
     $keys = array_keys($book);
 
@@ -90,15 +89,19 @@ if ($book) {
 ?>
 <div class="container-fluid">
     <h3>Edit Book</h3>
+    <a href="<?php echo get_url("admin/list_books.php");?>" class="btn btn-secondary">Back</a>
     <form method="POST">
         <?php foreach ($form as $k => $v) {
 
             render_input($v);
         } ?>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Update"]); ?>
+        <?php if (has_role("Admin")): ?>
+            <a href="<?php echo get_url("admin/delete_book.php?id=" . $id);?>" class="btn btn-danger">Delete</a>
+        <?php endif; ?>
     </form>
 
-</div>
+</>
 
 
 <?php
