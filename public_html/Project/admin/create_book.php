@@ -6,6 +6,9 @@ if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: $BASE_PATH" . "/home.php"));
 }
+
+// Initialize $db here to be used in all conditions
+$db = getDB();
 ?>
 
 <?php
@@ -18,9 +21,7 @@ if (isset($_POST["action"])) {
         $books = fetch_quote($title);
         error_log("Data from API: " . var_export($books, true));
 
-        // Insert each book entry into the database
         if (!empty($books)) {
-            $db = getDB();
             foreach ($books as $book) {
                 // Check if book exists
                 $checkQuery = "SELECT COUNT(*) as count FROM `IT202_S24_BOOKS` WHERE title = :title";
@@ -71,30 +72,39 @@ if (isset($_POST["action"])) {
         }
     } else if ($action === "enter") {
         // Sanitize and prepare data for insertion
-        $db = getDB();
-        $query = "INSERT INTO `IT202_S24_BOOKS` (title, page_count, series_name, language, summary, is_api) VALUES (:title, :page_count, :series_name, :language, :summary, :is_api)";
-        
-        // Ensure we only include valid fields
-        $params = [
-            ":title" => se($_POST, "title", "", false),
-            ":page_count" => is_numeric(se($_POST, "page_count", "0", false)) ? (int)se($_POST, "page_count", "0", false) : NULL,
-            ":series_name" => se($_POST, "series_name", "", false),
-            ":language" => se($_POST, "language", "", false),
-            ":summary" => se($_POST, "summary", "", false),
-            ":is_api" => 0
-        ];
+        $title = se($_POST, "title", "", false);
+        $page_count = is_numeric(se($_POST, "page_count", "0", false)) ? (int)se($_POST, "page_count", "0", false) : NULL;
+        $series_name = se($_POST, "series_name", "", false);
+        $language = se($_POST, "language", "", false);
+        $summary = se($_POST, "summary", "", false);
 
-        error_log("Query: " . $query);
-        error_log("Params: " . var_export($params, true));
+        // Check if book exists
+        $checkQuery = "SELECT COUNT(*) as count FROM `IT202_S24_BOOKS` WHERE title = :title";
+        $checkStmt = $db->prepare($checkQuery);
+        $checkStmt->execute([":title" => $title]);
+        $count = $checkStmt->fetch(PDO::FETCH_ASSOC)["count"];
 
-        try {
-            $stmt = $db->prepare($query);
-            $stmt->execute($params);
-            flash("Inserted record " . $db->lastInsertId(), "success");
-        } catch (PDOException $e) {
-            if($e->errorInfo[1] == 1062) {
-                flash("A book with this title already exists, please try another or edit it", "warning");
-            } else{
+        if ($count > 0) {
+            flash("A book with this title already exists, please try another or edit it", "warning");
+        } else {
+            $query = "INSERT INTO `IT202_S24_BOOKS` (title, page_count, series_name, language, summary, is_api) VALUES (:title, :page_count, :series_name, :language, :summary, :is_api)";
+            $params = [
+                ":title" => $title,
+                ":page_count" => $page_count,
+                ":series_name" => $series_name,
+                ":language" => $language,
+                ":summary" => $summary,
+                ":is_api" => 0
+            ];
+
+            error_log("Query: " . $query);
+            error_log("Params: " . var_export($params, true));
+
+            try {
+                $stmt = $db->prepare($query);
+                $stmt->execute($params);
+                flash("Inserted record " . $db->lastInsertId(), "success");
+            } catch (PDOException $e) {
                 error_log("Something broke with the query: " . var_export($e, true));
                 flash("An error occurred", "danger");
             }
