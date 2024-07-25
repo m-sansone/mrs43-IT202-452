@@ -6,7 +6,7 @@ ul a:hover{
 nav li a{color: darkcyan}
 input{border-radius: 10%;}
 body{
-    background-color: darkcyan;
-    color: darkslategrey;
+    background-color: rgb(5, 78, 46);
+    color: lightgrey;
 
 }
