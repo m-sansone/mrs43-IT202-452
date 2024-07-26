@@ -13,6 +13,7 @@ $db = getDB();
 
 <?php
 // Handle book fetch and enter
+//mrs43 7-25-2024
 if (isset($_POST["action"])) {
     $action = $_POST["action"];
     $title = strtoupper(se($_POST, "title", "", false));
@@ -36,13 +37,13 @@ if (isset($_POST["action"])) {
 
                 // Check for page_count at the top level
                 $page_count = isset($book["page_count"]) ? $book["page_count"] : null;
-
+                
                 // If page_count is null, check inside published_works array
                 if ($page_count === null && isset($book['published_works'][0]['page_count'])) {
                     $page_count = $book['published_works'][0]['page_count'];
                     error_log("Page count from published_works: " . var_export($page_count, true));
                 }
-
+                //mrs43 7-25-2024
                 // Check if summary is set
                 $summary = isset($book["summary"]) ? $book["summary"] : "No description available";
                 error_log("Summary: " . var_export($summary, true));
@@ -71,6 +72,7 @@ if (isset($_POST["action"])) {
             }
         }
     } else if ($action === "enter") {
+        //mrs43 7-25-2024
         // Sanitize and prepare data for insertion
         $title = se($_POST, "title", "", false);
         $page_count = is_numeric(se($_POST, "page_count", "0", false)) ? (int)se($_POST, "page_count", "0", false) : NULL;

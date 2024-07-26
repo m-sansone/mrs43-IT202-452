@@ -18,7 +18,12 @@ $query = "DELETE FROM `IT202_S24_BOOKS` WHERE id = :id";
 try {
     $stmt = $db->prepare($query);
     $stmt->execute([":id" => $id]);
-    flash("Deleted record with id $id", "success");
+    if($stmt->rowCount() > 0){
+        flash("Deleted record with id $id", "success");
+    } else{
+        flash("No record found with id $id", "warning");
+    }
+    
 } catch (Exception $e) {
     error_log("Error deleting book $id" . var_export($e, true));
     flash("Error deleting record", "danger");
