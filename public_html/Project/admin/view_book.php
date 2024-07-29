@@ -1,13 +1,19 @@
 <?php
-//note we need to go up 1 more directory
+// Note: we need to go up 1 more directory
 require(__DIR__ . "/../../../partials/nav.php");
 
 $id = se($_GET, "id", -1, false);
 $book = [];
+$authors = [];
+$categories = [];
+
 if ($id > -1) {
-    //fetch
+    // Fetch book details
     $db = getDB();
-    $query = "SELECT title, page_count, series_name, language, summary, is_api FROM `IT202_S24_BOOKS` WHERE id = :id";
+    $query = "SELECT title, page_count, series_name, language, summary, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
+    $authQuery = "SELECT author FROM `IT202-S24-AUTHORS` WHERE book_id = :id";
+    $catsQuery = "SELECT category FROM `IT202-S24-CATEGORIES` WHERE book_id = :id";
+    
     try {
         $stmt = $db->prepare($query);
         $stmt->execute([":id" => $id]);
@@ -15,6 +21,17 @@ if ($id > -1) {
         if ($r) {
             $book = $r;
         }
+
+        // Fetch authors
+        $stmt2 = $db->prepare($authQuery);
+        $stmt2->execute([":id" => $id]);
+        $authors = $stmt2->fetchAll(PDO::FETCH_COLUMN);
+
+        // Fetch categories
+        $stmt3 = $db->prepare($catsQuery);
+        $stmt3->execute([":id" => $id]);
+        $categories = $stmt3->fetchAll(PDO::FETCH_COLUMN);
+
     } catch (PDOException $e) {
         error_log("Error fetching record: " . var_export($e, true));
         flash("Error fetching record", "danger");
@@ -35,10 +52,10 @@ $is_api = $book['is_api'] ?? 0;
 <div class="container-fluid">
     <h3>View Book</h3>
     <div>
-        <a href="<?php echo get_url("admin/list_books.php");?>" class="btn btn-secondary">Back</a>
+        <a href="<?php echo get_url("admin/list_books.php"); ?>" class="btn btn-secondary">Back</a>
         <?php if (has_role("Admin")): ?>
-            <a href="<?php echo get_url("admin/edit_books.php?id=" . $id);?>" class="btn btn-success">Edit</a>
-            <a href="<?php echo get_url("admin/delete_book.php?id=" . $id);?>" class="btn btn-danger">Delete</a>
+            <a href="<?php echo get_url("admin/edit_books.php?id=" . $id); ?>" class="btn btn-success">Edit</a>
+            <a href="<?php echo get_url("admin/delete_book.php?id=" . $id); ?>" class="btn btn-danger">Delete</a>
         <?php endif; ?>
         <ul class="list-group list-group-flush mt-3">
             <li class="list-group-item">
@@ -59,11 +76,18 @@ $is_api = $book['is_api'] ?? 0;
             <li class="list-group-item list-group-item-success">
                 <strong>User or API Data: </strong><?php echo $is_api ? 'API' : 'User'; ?>
             </li>
+            <li class="list-group-item">
+                <strong>Authors: </strong>
+                <?php echo !empty($authors) ? implode(', ', $authors) : 'No authors found'; ?>
+            </li>
+            <li class="list-group-item">
+                <strong>Categories: </strong>
+                <?php echo !empty($categories) ? implode(', ', $categories) : 'No categories found'; ?>
+            </li>
         </ul>
     </div>
 </div>
 
 <?php
-//note we need to go up 1 more directory
-require_once(__DIR__ . "/../../../partials/flash.php");
+require(__DIR__ . "/../../../partials/flash.php");
 ?>

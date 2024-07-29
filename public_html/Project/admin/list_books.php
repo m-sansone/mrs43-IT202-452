@@ -9,8 +9,7 @@ if (!has_role("Admin")) {
 
 // Build search form
 $form = [
-    ["type" => "text", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
-    ["type" => "number", "name" => "page_count", "placeholder" => "Number of Pages", "label" => "Number of Pages", "include_margin" => false],
+    ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
     ["type" => "text", "name" => "series_name", "placeholder" => "Series", "label" => "Series", "include_margin" => false],
     ["type" => "text", "name" => "language", "placeholder" => "Language", "label" => "Language", "include_margin" => false],
     ["type" => "text", "name" => "summary", "placeholder" => "Summary", "label" => "Summary", "include_margin" => false],
@@ -20,7 +19,7 @@ $form = [
 ];
 error_log("Form data: " . var_export($form, true));
 
-$query = "SELECT id, title, language FROM `IT202_S24_BOOKS` WHERE 1=1";
+$query = "SELECT id, title, language, page_count FROM `IT202-S24-BOOKS` WHERE 1=1";
 $params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);

@@ -65,6 +65,7 @@ session_start();
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/list_books.php'); ?>">List Books</a></li>
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/create_book.php'); ?>">Enter Book</a></li>
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/fetch_book.php'); ?>">Fetch Book</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>
