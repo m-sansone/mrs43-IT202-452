@@ -2,6 +2,11 @@
 // Note: we need to go up 1 more directory
 require(__DIR__ . "/../../../partials/nav.php");
 
+if (!has_role("Admin")) {
+    flash("You don't have permission to view this page", "warning");
+    redirect("home.php");
+}
+
 $id = se($_GET, "id", -1, false);
 $book = [];
 $authors = [];
@@ -10,7 +15,7 @@ $categories = [];
 if ($id > -1) {
     // Fetch book details
     $db = getDB();
-    $query = "SELECT title, page_count, series_name, language, summary, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
+    $query = "SELECT title, page_count, series_name, language, summary, cover_art_url, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
     $authQuery = "SELECT author FROM `IT202-S24-AUTHORS` WHERE book_id = :book_id";
     $catsQuery = "SELECT category FROM `IT202-S24-CATEGORIES` WHERE book_id = :book_id";
 
@@ -35,7 +40,7 @@ if ($id > -1) {
     }
 } else {
     flash("Invalid id passed", "danger");
-    die(header("Location:" . get_url("admin/list_books.php")));
+    redirect("admin/list_books.php");
 }
 
 $title = htmlspecialchars($book['title'] ?? '');
@@ -43,6 +48,7 @@ $page_count = htmlspecialchars($book['page_count'] ?? '');
 $series_name = htmlspecialchars($book['series_name'] ?? '');
 $language = htmlspecialchars($book['language'] ?? '');
 $summary = htmlspecialchars($book['summary'] ?? '');
+$cover_art_url = htmlspecialchars($book['cover_art_url'] ?? '');
 $is_api = $book['is_api'] ?? 0;
 
 // Handle form submission for updating authors and categories
@@ -79,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $db->commit();
         flash("Updated authors and categories successfully");
-        header("Location: " . get_url("admin/view_book.php?id=" . $id));
+        redirect("admin/view_book.php");
         exit();
     } catch (PDOException $e) {
         $db->rollBack();
@@ -104,27 +110,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form method="POST" class="mt-3">
             <div class="form-group">
                 <label for="title">Title</label>
-                <input type="text" id="title" name="title" class="form-control" value="<?php echo $title; ?>" readonly />
-            </div>
-            <div class="form-group">
-                <label for="page_count">Number of Pages</label>
-                <input type="number" id="page_count" name="page_count" class="form-control" value="<?php echo $page_count; ?>" readonly />
+                <input type="text" id="title" name="title" class="form-control" value="<?php echo $title; ?>" />
             </div>
             <div class="form-group">
                 <label for="series_name">Series Name</label>
-                <input type="text" id="series_name" name="series_name" class="form-control" value="<?php echo $series_name; ?>" readonly />
-            </div>
-            <div class="form-group">
-                <label for="language">Language</label>
-                <input type="text" id="language" name="language" class="form-control" value="<?php echo $language; ?>" readonly />
-            </div>
-            <div class="form-group">
-                <label for="summary">Summary</label>
-                <textarea id="summary" name="summary" class="form-control" rows="4" readonly><?php echo $summary; ?></textarea>
-            </div>
-            <div class="form-group">
-                <label for="is_api">User or API Data</label>
-                <input type="text" id="is_api" name="is_api" class="form-control" value="<?php echo $is_api ? 'API' : 'User'; ?>" readonly />
+                <input type="text" id="series_name" name="series_name" class="form-control" value="<?php echo $series_name; ?>"/>
             </div>
             <div class="form-group">
                 <label for="authors">Authors (one per line)</label>
@@ -133,6 +123,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label for="categories">Categories (one per line)</label>
                 <textarea id="categories" name="categories" class="form-control" rows="4"><?php echo implode("\n", $categories); ?></textarea>
+            </div>
+            <div class="form-group">
+                <label for="page_count">Number of Pages</label>
+                <input type="number" id="page_count" name="page_count" class="form-control" value="<?php echo $page_count; ?>" />
+            </div>
+            <div class="form-group">
+                <label for="language">Language</label>
+                <input type="text" id="language" name="language" class="form-control" value="<?php echo $language; ?>"/>
+            </div>
+            <div class="form-group">
+                <label for="summary">Summary</label>
+                <textarea id="summary" name="summary" class="form-control" rows="4" readonly><?php echo $summary; ?></textarea>
+            </div>
+            <div class="form-group">
+                <label for="cover_art_url">Cover Image Url</label>
+                <input type="text" id="cover_art_url" name="cover_art_url" class="form-control" value="<?php echo $cover_art_url; ?>"/>
+            </div>
+            <div class="form-group">
+                <label for="is_api">User or API Data</label>
+                <input type="text" id="is_api" name="is_api" class="form-control" value="<?php echo $is_api ? 'API' : 'User'; ?>" readonly />
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
         </form>

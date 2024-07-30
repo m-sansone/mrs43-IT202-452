@@ -1,11 +1,6 @@
 <?php
 // Note we need to go up 1 more directory
-require(__DIR__ . "/../../../partials/nav.php");
-
-if (!has_role("Admin")) {
-    flash("You don't have permission to view this page", "warning");
-    redirect("home.php");
-}
+require(__DIR__ . "/../../partials/nav.php");
 
 // Build search form
 $form = [
@@ -13,11 +8,11 @@ $form = [
     ["type" => "text", "name" => "language", "placeholder" => "Language", "label" => "Language", "include_margin" => false],
     ["type" => "select", "name" => "sort", "label" => "Sort", "options" => ["title" => "Title", "page_count" => "Number of Pages", "language" => "Language"], "include_margin" => false],
     ["type" => "select", "name" => "order", "label" => "Order", "options" => ["asc" => "+", "desc" => "-"], "include_margin" => false],
-    ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false],
+    ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false]
 ];
 error_log("Form data: " . var_export($form, true));
 
-$query = "SELECT id, title, language, page_count FROM `IT202-S24-BOOKS` WHERE 1=1";
+$query = "SELECT id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` WHERE 1=1";
 $params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
@@ -96,14 +91,14 @@ try {
     flash("Unhandled error occurred", "danger");
 }
 
-$table = ["data" => $results, "title" => "Latest Searched Books", "ignored_columns" => ["id"], "view_url" => get_url("admin/view_book.php")];
+$table = ["data" => $results, "title" => "Libraries", "ignored_columns" => ["id"], "view_url" => get_url("view_book.php")];
 if(has_role("Admin")){
-    $table["edit_url"] = get_url("admin/edit_books.php");
-    $table["delete_url"] = get_url("admin/delete_book.php");
+    $table["edit_url"] = get_url("edit_book.php");
+    $table["delete_url"] = get_url("delete_book.php");
 }
 ?>
 <div class="container-fluid">
-    <h3>List Books</h3>
+    <h3>Find Books</h3>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
 
@@ -117,10 +112,16 @@ if(has_role("Admin")){
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
         <a href="?clear" class="btn btn-secondary">Clear</a>
     </form>
-    <?php render_table($table); ?>
+    <div class="row w-100 row-cols-auto row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+        <?php foreach ($results as $book) : ?>
+            <div class="col">
+                <?php render_book_card($book); ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
 </div>
 
 <?php
 // Note we need to go up 1 more directory
-require_once(__DIR__ . "/../../../partials/flash.php");
+require_once(__DIR__ . "/../../partials/flash.php");
 ?>

@@ -4,7 +4,7 @@ require(__DIR__ . "/../../../partials/nav.php");
 
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
-    die(header("Location: $BASE_PATH" . "/home.php"));
+    redirect("home.php");
 }
 
 // Handle form submission
@@ -16,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $summary = $_POST['summary'] ?? '';
     $authors = isset($_POST['authors']) ? array_map('trim', explode("\n", $_POST['authors'])) : [];
     $categories = isset($_POST['categories']) ? array_map('trim', explode("\n", $_POST['categories'])) : [];
+    $cover_art_url = $_POST['cover_art_url'] ?? '';
 
     $errors = [];
     if (empty($title)) {
@@ -47,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 flash("A book with this title already exists, please try another or edit it", "warning");
             } else {
                 // Insert book details
-                $query = "INSERT INTO `IT202-S24-BOOKS` (`title`, `page_count`, `series_name`, `language`, `summary`, `is_api`) VALUES (:title, :page_count, :series_name, :language, :summary, :is_api)";
+                $query = "INSERT INTO `IT202-S24-BOOKS` (`title`, `page_count`, `series_name`, `language`, `summary`, `cover_art_url`, `is_api`) VALUES (:title, :page_count, :series_name, :language, :summary, :cover_art_url, :is_api)";
                 $stmt = $db->prepare($query);
                 $params = [
                     ":title" => $title,
@@ -55,6 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     ":series_name" => $series_name,
                     ":language" => $language,
                     ":summary" => $summary,
+                    ":cover_art_url" => $cover_art_url, // Add cover_art_url to the params
                     ":is_api" => 0
                 ];
 
@@ -114,6 +116,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input name="title" class="form-control" required />
         </div>
         <div class="form-group">
+            <label>Authors (one per line)</label>
+            <textarea name="authors" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Categories (one per line)</label>
+            <textarea name="categories" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
             <label>Page Count</label>
             <input name="page_count" type="number" class="form-control" required />
         </div>
@@ -130,12 +140,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <textarea name="summary" class="form-control" required></textarea>
         </div>
         <div class="form-group">
-            <label>Authors (one per line)</label>
-            <textarea name="authors" class="form-control"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Categories (one per line)</label>
-            <textarea name="categories" class="form-control"></textarea>
+            <label>Cover Image Url</label>
+            <textarea name="cover_art_url" class="form-control"></textarea>
         </div>
         <input type="submit" value="Add Book" class="btn btn-primary" />
     </form>
