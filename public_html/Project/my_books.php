@@ -10,7 +10,10 @@ $form = [
     ["type" => "select", "name" => "order", "label" => "Order", "options" => ["asc" => "+", "desc" => "-"], "include_margin" => false],
     ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false]
 ];
-error_log("Form data: " . var_export($form, true));
+//error_log("Form data: " . var_export($form, true));
+
+$total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+WHERE user_id = :user_id", [":user_id" => get_user_id()]);
 
 $query = "SELECT b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
 JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
@@ -41,7 +44,7 @@ if (count($_GET) > 0) {
             $form[$k]["value"] = $_GET[$v["name"]];
         }
     }
-    
+
     //title
     $title = se($_GET, "title", "", false);
     if (!empty($title)) {
@@ -64,7 +67,7 @@ if (count($_GET) > 0) {
     //tell mysql I care about the data from table "b"
     if ($sort === "created" || $sort === "modified") {
         $sort = "b." . $sort;
-    }    
+    }
     $order = se($_GET, "order", "desc", false);
     if (!in_array($order, ["asc", "desc"])) {
         $order = "desc";
@@ -99,7 +102,7 @@ try {
 }
 
 $table = ["data" => $results, "title" => "Libraries", "ignored_columns" => ["id"], "view_url" => get_url("view_book.php")];
-if(has_role("Admin")){
+if (has_role("Admin")) {
     $table["edit_url"] = get_url("edit_book.php");
     $table["delete_url"] = get_url("delete_book.php");
 }
@@ -107,6 +110,7 @@ if(has_role("Admin")){
 <div class="container-fluid">
     <h3>My Books</h3>
     <form method="GET">
+
         <div class="row mb-3" style="align-items: flex-end;">
 
             <?php foreach ($form as $k => $v) : ?>
@@ -118,6 +122,7 @@ if(has_role("Admin")){
         </div>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
         <a href="?clear" class="btn btn-secondary">Clear</a>
+        <?php render_result_counts(count($results), $total_records); ?>
     </form>
     <div class="row w-100 row-cols-auto row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
         <?php foreach ($results as $book) : ?>
@@ -125,6 +130,11 @@ if(has_role("Admin")){
                 <?php render_book_card($book); ?>
             </div>
         <?php endforeach; ?>
+        <?php if (count($results) === 0) : ?>
+            <div class="col">
+                No results
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

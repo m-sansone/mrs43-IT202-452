@@ -1,6 +1,11 @@
 <?php
 // Note we need to go up 1 more directory
-require(__DIR__ . "/../../partials/nav.php");
+require(__DIR__ . "/../../../partials/nav.php");
+
+if (!has_role("Admin")) {
+    flash("You don't have permission to view this page", "warning");
+    redirect("home.php");
+}
 
 // Build search form
 $form = [
@@ -10,13 +15,16 @@ $form = [
     ["type" => "select", "name" => "order", "label" => "Order", "options" => ["asc" => "+", "desc" => "-"], "include_margin" => false],
     ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false]
 ];
-error_log("Form data: " . var_export($form, true));
+//error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS` b LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id");
+$total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+WHERE user_id = :user_id", [":user_id" => get_user_id()]);
 
-$query = "SELECT b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
-LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id WHERE 1=1";
-$params = [];
+$query = "SELECT b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
+JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+WHERE user_id = :user_id";
+
+$params = [":user_id" => get_user_id()];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
 if ($is_clear) {
@@ -105,10 +113,11 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>Find Books</h3>
+    <h3>My Books</h3>
     <form method="GET">
+
         <div class="row mb-3" style="align-items: flex-end;">
-        
+
             <?php foreach ($form as $k => $v) : ?>
                 <div class="col">
                     <?php render_input($v); ?>
@@ -136,5 +145,5 @@ if (has_role("Admin")) {
 
 <?php
 // Note we need to go up 1 more directory
-require_once(__DIR__ . "/../../partials/flash.php");
+require_once(__DIR__ . "/../../../partials/flash.php");
 ?>
