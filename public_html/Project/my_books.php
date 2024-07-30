@@ -12,9 +12,11 @@ $form = [
 ];
 error_log("Form data: " . var_export($form, true));
 
-$query = "SELECT b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
-LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id WHERE 1=1";
-$params = [];
+$query = "SELECT b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
+JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+WHERE user_id = :user_id";
+
+$params = [":user_id" => get_user_id()];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
 if ($is_clear) {
@@ -62,7 +64,7 @@ if (count($_GET) > 0) {
     //tell mysql I care about the data from table "b"
     if ($sort === "created" || $sort === "modified") {
         $sort = "b." . $sort;
-    }     
+    }    
     $order = se($_GET, "order", "desc", false);
     if (!in_array($order, ["asc", "desc"])) {
         $order = "desc";
@@ -103,7 +105,7 @@ if(has_role("Admin")){
 }
 ?>
 <div class="container-fluid">
-    <h3>Find Books</h3>
+    <h3>My Books</h3>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
 
