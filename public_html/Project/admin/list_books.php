@@ -17,6 +17,8 @@ $form = [
 ];
 error_log("Form data: " . var_export($form, true));
 
+$total_records = get_total_count("`IT202-S24-BOOKS`");
+
 $query = "SELECT id, title, language, page_count FROM `IT202-S24-BOOKS` WHERE 1=1";
 $params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
@@ -117,6 +119,7 @@ if(has_role("Admin")){
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
         <a href="?clear" class="btn btn-secondary">Clear</a>
     </form>
+    <?php render_result_counts(count($results), $total_records); ?>
     <?php render_table($table); ?>
 </div>
 

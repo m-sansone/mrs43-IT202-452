@@ -18,3 +18,7 @@ function render_table($data = array())
 function render_book_card($book = array()){
     include(__DIR__ . "/../partials/book_card.php");   
 }
+
+function render_result_counts($result_count, $total_count){
+    include(__DIR__ . "/../partials/results_counts.php");
+}
