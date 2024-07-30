@@ -1,14 +1,29 @@
 <?php
 // Note we need to go up 1 more directory
 require(__DIR__ . "/../../../partials/nav.php");
-
+$db = getDB();
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     redirect("home.php");
 }
 
+if(isset($_GET["remove"])){
+    $query = "DELETE FROM `IT202-S24-UserBooks` WHERE user_id = :user_id";
+    try{
+        $stmt = $db->prepare($query);
+        $stmt->execute([":user_id"=>get_user_id()]);
+        flash("Successfully cleared all libraries", "success");
+    } catch (PDOException $e){
+        error_log("Error removing book associations: " . var_export($e, true));
+        flash("Error removing book associations", "danger");
+    }
+
+    redirect("my_books.php");
+}
+
 // Build search form
 $form = [
+    ["type" => "", "name" => "username", "placeholder" => "Username", "label" => "Username", "include_margin" => false],
     ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
     ["type" => "text", "name" => "language", "placeholder" => "Language", "label" => "Language", "include_margin" => false],
     ["type" => "select", "name" => "sort", "label" => "Sort", "options" => ["title" => "Title", "page_count" => "Number of Pages", "language" => "Language"], "include_margin" => false],
@@ -17,14 +32,11 @@ $form = [
 ];
 //error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
-WHERE user_id = :user_id", [":user_id" => get_user_id()]);
+$total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id");
 
-$query = "SELECT b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
-JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
-WHERE user_id = :user_id";
-
-$params = [":user_id" => get_user_id()];
+$query = "SELECT u.username, b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
+JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id JOIN Users u on u.id = ub.user_id";
+$params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
 if ($is_clear) {
@@ -48,6 +60,13 @@ if (count($_GET) > 0) {
         if (in_array($v["name"], $keys)) {
             $form[$k]["value"] = $_GET[$v["name"]];
         }
+    }
+
+    //username
+    $username = se($_GET, "username", "", false);
+    if (!empty($username)) {
+        $query .= " AND u.username like :username";
+        $params[ ":username"] = "%$username%";
     }
 
     //title
@@ -92,7 +111,7 @@ if (count($_GET) > 0) {
     $query .= " LIMIT $limit";
 }
 
-$db = getDB();
+
 $stmt = $db->prepare($query);
 $results = [];
 try {
@@ -114,6 +133,9 @@ if (has_role("Admin")) {
 ?>
 <div class="container-fluid">
     <h3>My Books</h3>
+    <div>
+        <a href="?remove" onclick="!confirm('Are you sure?')?event.preventDefault():''" class="btn btn-danger">Clear All Libraries</a>
+    </div>
     <form method="GET">
 
         <div class="row mb-3" style="align-items: flex-end;">

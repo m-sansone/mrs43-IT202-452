@@ -7,6 +7,11 @@ if (!isset($book)) {
 
 <?php if (isset($book)) : ?>
     <div class="card mx-auto" style="width: 18rem;">
+        <?php if (isset($book["username"])) : ?>
+            <div class="card-header">
+                Saved by: <?php se($book, "username", "N/A"); ?>
+            </div>
+        <?php endif; ?>
         <img src="<?php se($book, "cover_art_url", "Unknown"); ?>" class="card-img-top" alt="...">
         <div class="card-body">
             <h5 class="card-title"><?php se($book, "title", "Unknown"); ?> </h5>
@@ -21,10 +26,6 @@ if (!isset($book)) {
             <?php if (!isset($book["user_id"]) || $book["user_id"] === "N/A") : ?>
                 <div class="card-body">
                     <a href="<?php echo get_url('api/add_book.php?book_id=' . $book["id"]); ?>" class="card-link">Add to library</a>
-                </div>
-            <?php else : ?>
-                <div class="card-body">
-                    <div class="bg-warning text-dark text-center">Book not available</div>
                 </div>
             <?php endif; ?>
         </div>

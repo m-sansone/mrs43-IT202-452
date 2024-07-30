@@ -52,7 +52,7 @@ session_start();
                 <?php if (has_role("Admin")) : ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                           Admin
+                           Roles
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/create_role.php'); ?>">Create Role</a></li>
@@ -68,6 +68,14 @@ session_start();
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/list_books.php'); ?>">List Books</a></li>
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/create_book.php'); ?>">Enter Book</a></li>
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/fetch_book.php'); ?>">Fetch Book</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                           Data Management
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/book_associations.php'); ?>">All Connections</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>

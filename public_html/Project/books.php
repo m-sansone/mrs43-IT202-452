@@ -14,8 +14,8 @@ error_log("Form data: " . var_export($form, true));
 
 $total_records = get_total_count("`IT202-S24-BOOKS` b LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id");
 
-$query = "SELECT b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
-LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id WHERE 1=1";
+$query = "SELECT u.username, b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
+LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id LEFT JOIN Users u on u.id = ub.user_id   WHERE 1=1";
 $params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
