@@ -24,7 +24,7 @@ if (!isset($book)) {
                 </div>
             <?php else : ?>
                 <div class="card-body">
-                    <div class="bg-warning text-dark text-center">book not available</div>
+                    <div class="bg-warning text-dark text-center">Book not available</div>
                 </div>
             <?php endif; ?>
         </div>

@@ -41,6 +41,7 @@ session_start();
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <?php if (is_logged_in()) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('home.php'); ?>">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('my_books.php'); ?>">My Library</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('profile.php'); ?>">Profile</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('books.php'); ?>">Find Books</a></li>
                 <?php endif; ?>
