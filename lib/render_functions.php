@@ -14,3 +14,7 @@ function render_table($data = array())
 {
     include(__DIR__ . "/../partials/table.php");
 }
+
+function render_book_card($book = array()){
+    include(__DIR__ . "/../partials/book_card.php");   
+}

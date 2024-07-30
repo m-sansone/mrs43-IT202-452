@@ -4,7 +4,7 @@ require(__DIR__ . "/../../../partials/nav.php");
 
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
-    die(header("Location: $BASE_PATH" . "/home.php"));
+    redirect("home.php");
 }
 
 // Handle book fetch
@@ -34,7 +34,7 @@ if (isset($_GET["title"])) {
                     flash("A book with this title already exists, please try another or edit it", "warning");
                 } else {
                     // Insert book details
-                    $query = "INSERT INTO `IT202-S24-BOOKS` (`title`, `page_count`, `series_name`, `language`, `summary`, `is_api`) VALUES (:title, :page_count, :series_name, :language, :summary, :is_api)";
+                    $query = "INSERT INTO `IT202-S24-BOOKS` (`title`, `page_count`, `series_name`, `language`, `summary`, `cover_art_url`, `is_api`) VALUES (:title, :page_count, :series_name, :language, :summary, :cover_art_url, :is_api)";
                     $stmt = $db->prepare($query);
                     $params = [
                         ":title" => $book['title'],
@@ -44,6 +44,11 @@ if (isset($_GET["title"])) {
                         ":summary" => $book['summary'] ?? "N/A",
                         ":is_api" => 1
                     ];
+
+                    if (isset($book['published_works']) && is_array($book['published_works'])) {
+                        $temp = $book['published_works'][0];
+                        $params[":cover_art_url"]=$temp["cover_art_url"];
+                    }
 
                     $stmt->execute($params);
                     $bookId = $db->lastInsertId();

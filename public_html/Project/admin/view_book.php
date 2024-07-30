@@ -10,7 +10,7 @@ $categories = [];
 if ($id > -1) {
     // Fetch book details
     $db = getDB();
-    $query = "SELECT title, page_count, series_name, language, summary, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
+    $query = "SELECT title, page_count, series_name, language, summary, cover_art_url, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
     $authQuery = "SELECT author FROM `IT202-S24-AUTHORS` WHERE book_id = :id";
     $catsQuery = "SELECT category FROM `IT202-S24-CATEGORIES` WHERE book_id = :id";
     
@@ -38,7 +38,7 @@ if ($id > -1) {
     }
 } else {
     flash("Invalid id passed", "danger");
-    die(header("Location:" . get_url("admin/list_books.php")));
+    redirect("admin/list_books.php");
 }
 
 $title = htmlspecialchars($book['title'] ?? '');
@@ -46,6 +46,7 @@ $page_count = htmlspecialchars($book['page_count'] ?? '');
 $series_name = htmlspecialchars($book['series_name'] ?? '');
 $language = htmlspecialchars($book['language'] ?? '');
 $summary = htmlspecialchars($book['summary'] ?? '');
+$cover_art_url = htmlspecialchars($book['cover_art_url'] ?? '');
 $is_api = $book['is_api'] ?? 0;
 ?>
 
@@ -59,10 +60,21 @@ $is_api = $book['is_api'] ?? 0;
         <?php endif; ?>
         <ul class="list-group list-group-flush mt-3">
             <li class="list-group-item">
+                <img src="<?php echo $cover_art_url; ?>" alt="cover">
+            </li>
+            <li class="list-group-item">
                 <strong>Title: </strong><?php echo $title; ?>
             </li>
             <li class="list-group-item list-group-item-success">
                 <strong>Series Name: </strong><?php echo $series_name; ?>
+            </li>
+            <li class="list-group-item">
+                <strong>Authors: </strong>
+                <?php echo !empty($authors) ? implode(', ', $authors) : 'No authors found'; ?>
+            </li>
+            <li class="list-group-item list-group-item-success">
+                <strong>Categories: </strong>
+                <?php echo !empty($categories) ? implode(', ', $categories) : 'No categories found'; ?>
             </li>
             <li class="list-group-item">
                 <strong>Language: </strong><?php echo $language; ?>
@@ -75,14 +87,6 @@ $is_api = $book['is_api'] ?? 0;
             </li>
             <li class="list-group-item list-group-item-success">
                 <strong>User or API Data: </strong><?php echo $is_api ? 'API' : 'User'; ?>
-            </li>
-            <li class="list-group-item">
-                <strong>Authors: </strong>
-                <?php echo !empty($authors) ? implode(', ', $authors) : 'No authors found'; ?>
-            </li>
-            <li class="list-group-item">
-                <strong>Categories: </strong>
-                <?php echo !empty($categories) ? implode(', ', $categories) : 'No categories found'; ?>
             </li>
         </ul>
     </div>
