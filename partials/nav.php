@@ -43,7 +43,8 @@ session_start();
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('home.php'); ?>">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('my_books.php'); ?>">My Library</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('profile.php'); ?>">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('books.php'); ?>">Find Books</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('books.php'); ?>">Explore Books</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('new_books.php'); ?>">Find Undiscovered Books</a></li>
                 <?php endif; ?>
                 <?php if (!is_logged_in()) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('login.php'); ?>">Login</a></li>

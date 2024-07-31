@@ -23,11 +23,15 @@ if (!isset($book)) {
 
             </div>
 
+            <div class="card-body">
             <?php if (!isset($book["user_id"]) || $book["user_id"] === "N/A") : ?>
                 <div class="card-body">
                     <a href="<?php echo get_url('api/add_book.php?book_id=' . $book["id"]); ?>" class="card-link">Add to library</a>
                 </div>
             <?php endif; ?>
+            </div>
+
+            
         </div>
     </div>
 <?php endif; ?>
