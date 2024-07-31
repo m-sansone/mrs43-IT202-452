@@ -8,6 +8,7 @@ if(isset($_GET["book_id"]) && is_logged_in()){
         $stmt = $db->prepare($query);
         $stmt->execute([":user_id" => get_user_id(), ":book_id" => $_GET["book_id"]]);
         flash("Successfully added to library", "success");
+        redirect("my_books.php");
     } catch(PDOException $e){
         if($e->errorInfo[1] === 1062){
             flash("This book isn't available", "danger");
