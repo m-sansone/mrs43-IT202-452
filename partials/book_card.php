@@ -9,7 +9,7 @@ if (!isset($book)) {
     <div class="card mx-auto" style="width: 18rem;">
         <?php if (isset($book["username"])) : ?>
             <div class="card-header">
-                Saved by: <?php se($book, "username", "N/A"); ?>
+                Saved by: <a href="<?php echo get_url("profile.php?id=" . $book["user_id"]); ?>"><?php se($book, "username", "N/A"); ?></a>
             </div>
         <?php endif; ?>
         <img src="<?php se($book, "cover_art_url", "Unknown"); ?>" class="card-img-top" alt="...">
@@ -24,10 +24,14 @@ if (!isset($book)) {
             </div>
 
             <div class="card-body">
+            <?php if (isset($book["id"])) : ?>
+                    <a class="btn btn-secondary" href="<?php echo get_url("book.php?id=" . $book["id"]); ?>">View</a>
+                <?php endif; ?>                
             <?php if (!isset($book["user_id"]) || $book["user_id"] === "N/A") : ?>
-                <div class="card-body">
-                    <a href="<?php echo get_url('api/add_book.php?book_id=' . $book["id"]); ?>" class="card-link">Add to library</a>
-                </div>
+                <?php
+                $id = isset($book["id"]) ? $book["id"] : (isset($_GET["id"]) ? $_GET["id"] : -1);
+                ?>
+                <a href="<?php echo get_url('api/add_book.php?book_id=' . $id); ?>" class="card-link">Add to library</a>
             <?php endif; ?>
             </div>
 
