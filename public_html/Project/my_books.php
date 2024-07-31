@@ -15,8 +15,8 @@ $form = [
 $total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
 WHERE user_id = :user_id", [":user_id" => get_user_id()]);
 
-$query = "SELECT b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
-JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+$query = "SELECT username, b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
+JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id LEFT JOIN Users u on u.id = ub.user_id
 WHERE user_id = :user_id";
 
 $params = [":user_id" => get_user_id()];
