@@ -122,7 +122,7 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>Find Books</h3>
+    <h3>Explore Books</h3>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
             <?php foreach ($form as $k => $v) : ?>
