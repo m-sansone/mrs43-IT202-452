@@ -21,6 +21,23 @@ if (isset($_GET["remove_book"]) && isset($_GET["book_id"])) {
     redirect("my_books.php");
 }
 
+// Handle remove all books action
+if (isset($_GET["clear_all"])) {
+    $db = getDB();
+    $query = "DELETE FROM `IT202-S24-UserBooks` WHERE user_id = :user_id";
+    try {
+        $stmt = $db->prepare($query);
+        $stmt->execute([
+            ":user_id" => get_user_id()
+        ]);
+        flash("Successfully removed all books from your library", "success");
+    } catch (PDOException $e) {
+        error_log("Error removing all books from library: " . var_export($e, true));
+        flash("Error removing all books from library", "danger");
+    }
+    redirect("my_books.php");
+}
+
 // Build search form
 $form = [
     ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
