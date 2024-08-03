@@ -7,6 +7,40 @@ if (!has_role("Admin")) {
     redirect("home.php");
 }
 
+// Define the get_total_count function if not already defined
+if (!function_exists('get_total_count')) {
+    function get_total_count($table_refs, $params = []) {
+        $table_refs = preg_replace('/[^a-zA-Z0-9_\-.`\s=:()]/', '', $table_refs);
+        error_log("Table refs $table_refs");
+        error_log("Params: " . var_export($params, true));
+        foreach ($params as $k => $v) {
+            if (!str_starts_with($k, ":")) {
+                $params[":$k"] = $v;
+                unset($params[$k]);
+            }
+        }
+        $query = "SELECT COUNT(DISTINCT b.id) as totalCount FROM $table_refs";
+        try {
+            $db = getDB();
+            $stmt = $db->prepare($query);
+            foreach ($params as $key => $value) {
+                $stmt->bindValue("$key", $value);
+                error_log("Binding value for $key: $value");
+            }
+            $stmt->execute();
+            $r = $stmt->fetch();
+            if ($r) {
+                return (int)$r["totalCount"];
+            }
+            return 0;
+        } catch (PDOException $e) {
+            error_log("Error getting count for " . var_export($query, true) . ": " . var_export($e, true));
+            flash("Error getting count", "danger");
+        }
+        return -1;
+    }
+}
+
 // Build search form
 $form = [
     ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
@@ -17,7 +51,7 @@ $form = [
 ];
 error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS`");
+$total_records = get_total_count("`IT202-S24-BOOKS` b");
 
 $query = "SELECT id, title, language, page_count FROM `IT202-S24-BOOKS` WHERE 1=1";
 $params = [];
@@ -99,7 +133,7 @@ try {
 }
 
 $table = ["data" => $results, "title" => "Latest Searched Books", "ignored_columns" => ["id"], "view_url" => get_url("admin/view_book.php")];
-if(has_role("Admin")){
+if (has_role("Admin")) {
     $table["edit_url"] = get_url("admin/edit_books.php");
     $table["delete_url"] = get_url("admin/delete_book.php");
 }

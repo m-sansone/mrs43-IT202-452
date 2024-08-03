@@ -14,8 +14,19 @@ error_log("Form data: " . var_export($form, true));
 
 $total_records = get_total_count("`IT202-S24-BOOKS` b LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id");
 
-$query = "SELECT u.username, b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
-LEFT JOIN `IT202-S24-UserBooks` ub on b.id = ub.book_id LEFT JOIN Users u on u.id = ub.user_id   WHERE 1=1";
+$query = "SELECT b.id, 
+                 MIN(u.username) as username, 
+                 title, 
+                 language, 
+                 page_count, 
+                 cover_art_url, 
+                 MIN(ub.user_id) as user_id 
+          FROM `IT202-S24-BOOKS` b
+          LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id 
+          LEFT JOIN Users u ON u.id = ub.user_id 
+          WHERE 1=1";
+
+// Initialize parameters
 $params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
@@ -27,11 +38,14 @@ if ($is_clear) {
     $session_data = session_load($session_key);
 }
 
+// Load session data if no GET parameters are present
 if (count($_GET) == 0 && isset($session_data) && count($session_data) > 0) {
     if ($session_data) {
         $_GET = $session_data;
     }
 }
+
+// Apply filters
 if (count($_GET) > 0) {
     session_save($session_key, $_GET);
     $keys = array_keys($_GET);
@@ -42,26 +56,26 @@ if (count($_GET) > 0) {
         }
     }
 
-    //title
+    // Title filter
     $title = se($_GET, "title", "", false);
     if (!empty($title)) {
-        $query .= " AND title like :title";
+        $query .= " AND title LIKE :title";
         $params[":title"] = "%$title%";
     }
 
-    //language
+    // Language filter
     $language = se($_GET, "language", "", false);
     if (!empty($language)) {
-        $query .= " AND language like :language";
+        $query .= " AND language LIKE :language";
         $params[":language"] = "%$language%";
     }
 
-    //sort and order
+    // Sort and Order
     $sort = se($_GET, "sort", "title", false);
     if (!in_array($sort, ["title", "page_count", "language"])) {
         $sort = "title";
     }
-    //tell mysql I care about the data from table "b"
+    // Tell MySQL to consider the data from table "b"
     if ($sort === "created" || $sort === "modified") {
         $sort = "b." . $sort;
     }
@@ -69,9 +83,10 @@ if (count($_GET) > 0) {
     if (!in_array($order, ["asc", "desc"])) {
         $order = "desc";
     }
-    //IMPORTANT make sure you fully validate/trust $sort and $order (sql injection possibility)
+    $query .= " GROUP BY b.id, title, language, page_count, cover_art_url"; // Group by non-aggregated columns
     $query .= " ORDER BY $sort $order";
-    //limit
+    
+    // Limit
     try {
         $limit = (int)se($_GET, "limit", "10", false);
     } catch (Exception $e) {
@@ -80,8 +95,10 @@ if (count($_GET) > 0) {
     if ($limit < 1 || $limit > 100) {
         $limit = 10;
     }
-    //IMPORTANT make sure you fully validate/trust $limit (sql injection possibility)
     $query .= " LIMIT $limit";
+} else {
+    // Ensure GROUP BY is still included if no filters are applied
+    $query .= " GROUP BY b.id, title, language, page_count, cover_art_url";
 }
 
 $db = getDB();
@@ -89,7 +106,7 @@ $stmt = $db->prepare($query);
 $results = [];
 try {
     $stmt->execute($params);
-    $r = $stmt->fetchAll();
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if ($r) {
         $results = $r;
     }
@@ -108,13 +125,11 @@ if (has_role("Admin")) {
     <h3>Find Books</h3>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
-        
             <?php foreach ($form as $k => $v) : ?>
                 <div class="col">
                     <?php render_input($v); ?>
                 </div>
             <?php endforeach; ?>
-
         </div>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
         <a href="?clear" class="btn btn-secondary">Clear</a>

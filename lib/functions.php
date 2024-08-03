@@ -33,3 +33,6 @@ require(__DIR__ . "/api_helper.php");
 
 require(__DIR__ . "/db_helpers.php");
 require(__DIR__ . "/session_store.php");
+
+require(__DIR__ . "/book_helper.php");
+require(__DIR__ . "/book_api.php");

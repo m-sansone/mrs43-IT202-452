@@ -2,6 +2,12 @@
 // Note we need to go up 1 more directory
 require(__DIR__ . "/../../partials/nav.php");
 
+// Ensure user is authenticated and user_id is available
+if (!is_logged_in()) {
+    redirect("login.php");
+}
+$user_id = get_user_id(); // This function should retrieve the currently authenticated user's ID
+
 // Build search form
 $form = [
     ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
@@ -12,11 +18,13 @@ $form = [
 ];
 error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS` b WHERE b.id NOT IN (SELECT book_id FROM `IT202-S24-UserBooks`)");
+$total_records = get_total_count("`IT202-S24-BOOKS` b WHERE b.id NOT IN (SELECT book_id FROM `IT202-S24-UserBooks` WHERE user_id = :user_id)", [":user_id" => $user_id]);
 
-$query = "SELECT b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
-WHERE b.id NOT IN (SELECT book_id FROM `IT202-S24-UserBooks`)";
-$params = [];
+$query = "SELECT DISTINCT b.id, title, language, page_count, cover_art_url 
+          FROM `IT202-S24-BOOKS` b
+          LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id AND ub.user_id = :user_id 
+          WHERE ub.user_id IS NULL";
+$params = [":user_id" => $user_id];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
 if ($is_clear) {

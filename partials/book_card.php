@@ -12,7 +12,7 @@ if (!isset($book)) {
                 Saved by: <a href="<?php echo get_url("profile.php?id=" . $book["user_id"]); ?>"><?php se($book, "username", "N/A"); ?></a>
             </div>
         <?php endif; ?>
-        <img src="<?php se($book, "cover_art_url", "Unknown"); ?>" class="card-img-top" alt="...">
+        <img src="<?php se($book, "cover_art_url", "Unknown"); ?>" class="card-img-top img-thumbnail w-auto p-2" style="height: 400px" alt="...">
         <div class="card-body">
             <h5 class="card-title"><?php se($book, "title", "Unknown"); ?> </h5>
             <div class="card-text">
@@ -20,22 +20,20 @@ if (!isset($book)) {
                     <li class="list-group-item">Number of Pages: <?php se($book, "page_count", "Unknown"); ?></li>
                     <li class="list-group-item">Language: <?php se($book, "language", "Unknown"); ?></li>
                 </ul>
-
             </div>
-
             <div class="card-body">
-            <?php if (isset($book["id"])) : ?>
+                <?php 
+                $curr_user_id = get_user_id();
+                if (isset($book["id"])) : ?>
                     <a class="btn btn-secondary" href="<?php echo get_url("book.php?id=" . $book["id"]); ?>">View</a>
-                <?php endif; ?>                
-            <?php if (!isset($book["user_id"]) || $book["user_id"] === "N/A") : ?>
-                <?php
-                $id = isset($book["id"]) ? $book["id"] : (isset($_GET["id"]) ? $_GET["id"] : -1);
-                ?>
-                <a href="<?php echo get_url('api/add_book.php?book_id=' . $id); ?>" class="card-link">Add to library</a>
-            <?php endif; ?>
+                <?php endif; ?>
+                <?php if (!isset($book["user_id"]) || $book["user_id"] != $curr_user_id) : ?>
+                    <?php
+                    $id = isset($book["id"]) ? $book["id"] : (isset($_GET["id"]) ? $_GET["id"] : -1);
+                    ?>
+                    <a href="<?php echo get_url('api/add_book.php?book_id=' . $id); ?>" class="btn btn-success">Add to library</a>
+                <?php endif; ?>
             </div>
-
-            
         </div>
     </div>
 <?php endif; ?>
