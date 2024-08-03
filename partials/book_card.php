@@ -33,6 +33,12 @@ if (!isset($book)) {
                     ?>
                     <a href="<?php echo get_url('api/add_book.php?book_id=' . $id); ?>" class="btn btn-success">Add to library</a>
                 <?php endif; ?>
+                <?php if (isset($book["user_id"]) && $book["user_id"] == $curr_user_id) : ?>
+                    <form method="GET" style="display:inline;">
+                        <input type="hidden" name="book_id" value="<?php se($book, "id", ""); ?>">
+                        <button type="submit" name="remove_book" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this book from your library?');">Remove</button>
+                    </form>
+                <?php endif; ?>
             </div>
         </div>
     </div>

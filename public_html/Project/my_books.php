@@ -2,6 +2,25 @@
 // Note we need to go up 1 more directory
 require(__DIR__ . "/../../partials/nav.php");
 
+// Handle remove book action
+if (isset($_GET["remove_book"]) && isset($_GET["book_id"])) {
+    $book_id = (int)$_GET["book_id"];
+    $db = getDB();
+    $query = "DELETE FROM `IT202-S24-UserBooks` WHERE user_id = :user_id AND book_id = :book_id";
+    try {
+        $stmt = $db->prepare($query);
+        $stmt->execute([
+            ":user_id" => get_user_id(),
+            ":book_id" => $book_id
+        ]);
+        flash("Successfully removed the book from your library", "success");
+    } catch (PDOException $e) {
+        error_log("Error removing book from library: " . var_export($e, true));
+        flash("Error removing book from library", "danger");
+    }
+    redirect("my_books.php");
+}
+
 // Build search form
 $form = [
     ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
@@ -10,10 +29,8 @@ $form = [
     ["type" => "select", "name" => "order", "label" => "Order", "options" => ["asc" => "+", "desc" => "-"], "include_margin" => false],
     ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false]
 ];
-//error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
-WHERE user_id = :user_id", [":user_id" => get_user_id()]);
+$total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id WHERE user_id = :user_id", [":user_id" => get_user_id()]);
 
 $query = "SELECT u.username, b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
 JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id LEFT JOIN Users u on u.id = ub.user_id
@@ -64,7 +81,6 @@ if (count($_GET) > 0) {
     if (!in_array($sort, ["title", "page_count", "language"])) {
         $sort = "title";
     }
-    //tell mysql I care about the data from table "b"
     if ($sort === "created" || $sort === "modified") {
         $sort = "b." . $sort;
     }
@@ -72,8 +88,8 @@ if (count($_GET) > 0) {
     if (!in_array($order, ["asc", "desc"])) {
         $order = "desc";
     }
-    //IMPORTANT make sure you fully validate/trust $sort and $order (sql injection possibility)
     $query .= " ORDER BY $sort $order";
+
     //limit
     try {
         $limit = (int)se($_GET, "limit", "10", false);
@@ -83,7 +99,6 @@ if (count($_GET) > 0) {
     if ($limit < 1 || $limit > 100) {
         $limit = 10;
     }
-    //IMPORTANT make sure you fully validate/trust $limit (sql injection possibility)
     $query .= " LIMIT $limit";
 }
 
@@ -109,18 +124,16 @@ if (has_role("Admin")) {
 <div class="container-fluid">
     <h3>My Books</h3>
     <form method="GET">
-
         <div class="row mb-3" style="align-items: flex-end;">
-
             <?php foreach ($form as $k => $v) : ?>
                 <div class="col">
                     <?php render_input($v); ?>
                 </div>
             <?php endforeach; ?>
-
         </div>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
-        <a href="?clear" class="btn btn-secondary">Clear</a>
+        <a href="?clear" class="btn btn-secondary">Clear Filters</a>
+        <a href="?clear_all" class="btn btn-danger" onclick="return confirm('Are you sure you want to clear all books from your library?');">Remove All Books</a>
         <?php render_result_counts(count($results), $total_records); ?>
     </form>
     <div class="row w-100 row-cols-auto row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
@@ -138,6 +151,5 @@ if (has_role("Admin")) {
 </div>
 
 <?php
-// Note we need to go up 1 more directory
 require_once(__DIR__ . "/../../partials/flash.php");
 ?>
