@@ -15,7 +15,7 @@ $form = [
 $total_records = get_total_count("`IT202-S24-BOOKS` b JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
 WHERE user_id = :user_id", [":user_id" => get_user_id()]);
 
-$query = "SELECT username, b.id, title, language, page_count, cover_art_url FROM `IT202-S24-BOOKS` b
+$query = "SELECT u.username, b.id, title, language, page_count, cover_art_url, ub.user_id FROM `IT202-S24-BOOKS` b
 JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id LEFT JOIN Users u on u.id = ub.user_id
 WHERE user_id = :user_id";
 
@@ -101,9 +101,8 @@ try {
     flash("Unhandled error occurred", "danger");
 }
 
-$table = ["data" => $results, "title" => "Libraries", "ignored_columns" => ["id"], "view_url" => get_url("view_book.php")];
+$table = ["data" => $results, "title" => "Libraries", "ignored_columns" => ["id"], "view_url" => get_url("book.php")];
 if (has_role("Admin")) {
-    $table["edit_url"] = get_url("edit_book.php");
     $table["delete_url"] = get_url("delete_book.php");
 }
 ?>
