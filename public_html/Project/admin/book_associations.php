@@ -132,7 +132,7 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>My Books</h3>
+    <h3>All Associations</h3>
     <div>
         <a href="?remove" onclick="!confirm('Are you sure?')?event.preventDefault():''" class="btn btn-danger">Clear All Libraries</a>
     </div>
