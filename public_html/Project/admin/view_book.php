@@ -53,7 +53,7 @@ $is_api = $book['is_api'] ?? 0;
 <div class="container-fluid">
     <h3>View Book</h3>
     <div>
-        <a href="<?php echo get_url("admin/list_books.php"); ?>" class="btn btn-secondary">Back</a>
+        <a href="javascript:history.go(-1)" class="btn btn-secondary">Back</a>
         <?php if (has_role("Admin")): ?>
             <a href="<?php echo get_url("admin/edit_books.php?id=" . $id); ?>" class="btn btn-success">Edit</a>
             <a href="<?php echo get_url("admin/delete_book.php?id=" . $id); ?>" class="btn btn-danger">Delete</a>
