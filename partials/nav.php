@@ -77,6 +77,7 @@ session_start();
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/book_associations.php'); ?>">All Connections</a></li>
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/associate_books.php'); ?>">Manage User Libraries</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>
