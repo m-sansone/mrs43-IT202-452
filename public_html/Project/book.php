@@ -11,21 +11,21 @@ $categories = [];
 if ($id > -1) {
     $db = getDB();
     
-    // Fetch the specific book
-    $query = "SELECT id, title FROM `IT202-S24-BOOKS` WHERE id = :id";
+    // Check if the book needs an update
+    $query = "SELECT IF(MAX(modified) < DATE(CONVERT_TZ(CURDATE(),'+00:00','-05:00')), 1, 0) as `needs_update`, id, title FROM `IT202-S24-BOOKS` WHERE id = :id";
     try {
         $stmt = $db->prepare($query);
         $stmt->execute([":id" => $id]);
-        $book = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch latest book based on ID
-        if ($book) {
-            $title = $book["title"];
-            $result = fetch_quote($title);
-            if (is_array($result) && !empty($result)) {
-                // Update only if ID matches
-                if ($result['id'] == $id) {
-                    $insert_result = insert("`IT202-S24-BOOKS`", $result);
+        if ($result && $result['needs_update']) {
+            $title = $result["title"];
+            $fetched_data = fetch_quote($title);
+
+            if (is_array($fetched_data) && !empty($fetched_data)) {
+                // Update the book if data is fetched successfully
+                if ($fetched_data['id'] == $id) {
+                    $insert_result = insert("`IT202-S24-BOOKS`", $fetched_data);
                     recalculate_book($id);
                     error_log("Update of $title: " . var_export($insert_result, true));
                 }
