@@ -72,7 +72,7 @@ if (isset($_POST["username"])) {
 
 ?>
 <div class="container-fluid">
-    <h1>Assign Roles</h1>
+    <h2>Assign Roles</h2>
     <form method="POST">
         <?php render_input(["type" => "search", "name" => "username", "placeholder" => "Username Search", "value" => $username]);/*lazy value to check if form submitted, not ideal*/ ?>
         <?php render_button(["text" => "Search", "type" => "submit"]); ?>

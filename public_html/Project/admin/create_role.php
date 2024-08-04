@@ -22,7 +22,7 @@ if (isset($_POST["name"]) && isset($_POST["description"])) {
             if ($e->errorInfo[1] === 1062) {
                 flash("A role with this name already exists, please try another", "warning");
             } else {
-                flash("Unknown error occured. Please try again", "danger");
+                flash("Unknown error occurred, please try again", "danger");
                 error_log(var_export($e->errorInfo, true));
             }
         }
@@ -33,7 +33,7 @@ if (isset($_POST["name"]) && isset($_POST["description"])) {
     <h1>Create Role</h1>
     <form method="POST">
         <?php render_input(["id" => "name", "name" => "name", "label" => "Name", "rules" => ["required" => true]]); ?>
-        <?php render_input(["type" => "textarea", "id" => "name", "name" => "name", "label" => "Description", "rules" => ["required" => true]]); ?>
+        <?php render_input(["type" => "textarea", "id" => "name", "name" => "descriptions", "label" => "Description", "rules" => ["required" => true]]); ?>
         <?php render_button(["text" => "Create Role", "type" => "submit"]); ?>
     </form>
 </div>

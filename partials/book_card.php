@@ -25,7 +25,7 @@ if (!isset($book)) {
                 <?php 
                 $curr_user_id = get_user_id();
                 if (isset($book["id"])) : ?>
-                    <a class="btn btn-secondary" href="<?php echo get_url("book.php?id=" . $book["id"]); ?>">View</a>
+                    <a href="book.php?id=<?= se($book['id'], null) ?>" class="btn btn-secondary">View</a>
                 <?php endif; ?>
                 <?php if (!isset($book["user_id"]) || $book["user_id"] != $curr_user_id) : ?>
                     <?php

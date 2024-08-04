@@ -146,11 +146,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             error_log("Error applying associations " . var_export($e, true));
             flash("Unhandled error occurred: " . $e->getMessage(), "danger");
         }
+        redirect("admin/associate_books.php");
     }
 }
 ?>
 <div class="container-fluid">
-    <h3>Manage User Libraries</h3>
+    <h2>Manage User Libraries</h2>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
             <?php foreach ($form as $k => $v) : ?>

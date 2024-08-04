@@ -139,7 +139,7 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>My Books</h3>
+    <h2>My Library</h2>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
             <?php foreach ($form as $k => $v) : ?>

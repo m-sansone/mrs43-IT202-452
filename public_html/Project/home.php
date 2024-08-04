@@ -1,7 +1,10 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
 ?>
-<h1>Home</h1>
+<div class="container-fluid">
+    <h2>Home</h2>
+</div>
+
 <?php
 
 if (is_logged_in(true)) {

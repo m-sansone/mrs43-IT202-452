@@ -109,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <div class="container-fluid">
-    <h1>Enter New Book</h1>
+    <h2>Enter New Book</h2>
     <form method="POST" action="">
         <div class="form-group">
             <label>Book Title</label>
@@ -143,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Cover Image Url</label>
             <textarea name="cover_art_url" class="form-control"></textarea>
         </div>
-        <input type="submit" value="Add Book" class="btn btn-primary" />
+        <input type="submit" value="Add Book" class="btn btn-success" />
     </form>
 </div>
 <?php
