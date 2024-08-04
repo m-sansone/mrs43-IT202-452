@@ -48,7 +48,7 @@ $table = ["data"=>$roles, "post_self_form"=>["name"=>"role_id", "label"=>"Toggle
 
 ?>
 <div class="container-fluid">
-    <h1>List Roles</h1>
+    <h2>List Roles</h2>
     <form method="POST">
         <?php render_input(["type" => "search", "name" => "role", "placeholder" => "Role Filter", "value"=>$search]);/*lazy value to check if form submitted, not ideal*/ ?>
         <?php render_button(["text" => "Search", "type" => "submit"]); ?>

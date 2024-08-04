@@ -139,7 +139,7 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>List Books</h3>
+    <h2>List Books</h2>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
 

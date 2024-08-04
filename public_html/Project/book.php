@@ -1,61 +1,44 @@
 <?php
 // Note: we need to go up 1 more directory
 require_once(__DIR__ . "/../../partials/nav.php");
-require_once(__DIR__ . "/../../lib/functions.php");
+require(__DIR__ . "/../../lib/functions.php");
 
 $id = se($_GET, "id", -1, false);
-$books = [];
+$book = [];
 $authors = [];
 $categories = [];
 
 if ($id > -1) {
     $db = getDB();
     
-    // Fetch latest book
-    $query = "SELECT MAX(id) as latest_id, title FROM `IT202-S24-BOOKS` WHERE title IN (SELECT title FROM `IT202-S24-BOOKS` b WHERE b.id = :id) GROUP BY title LIMIT 5";
+    // Fetch the specific book
+    $query = "SELECT id, title FROM `IT202-S24-BOOKS` WHERE id = :id";
     try {
         $stmt = $db->prepare($query);
         $stmt->execute([":id" => $id]);
-        $r = $stmt->fetchAll();
-        if ($r) {
-            $books = $r;
-        }
-    } catch (PDOException $e) {
-        error_log("Error fetching latest books: " . var_export($e, true));
-    }
+        $book = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $didUpdate = false;
-    if ($books) {
-        // Fetch and update book data
-        foreach ($books as $book) {
+        // Fetch latest book based on ID
+        if ($book) {
             $title = $book["title"];
-            // Placeholder for condition; assume it needs updating
-            if (true) {
-                try {
-                    $result = fetch_quote($title);
-                    if (is_array($result) && !empty($result)) {
-                        $insert_result = insert("`IT202-S24-BOOKS`", $result);
-                        $didUpdate = true;
-                        error_log("Update of $title: " . var_export($insert_result, true));
-                    } else {
-                        error_log("No data returned for title $title");
-                    }
-                } catch (Exception $e) {
-                    error_log("Error updating title $title: " . var_export($e, true));
+            $result = fetch_quote($title);
+            if (is_array($result) && !empty($result)) {
+                // Update only if ID matches
+                if ($result['id'] == $id) {
+                    $insert_result = insert("`IT202-S24-BOOKS`", $result);
+                    recalculate_book($id);
+                    error_log("Update of $title: " . var_export($insert_result, true));
                 }
+            } else {
+                error_log("No data returned for title $title");
             }
         }
-    }
-    if ($didUpdate) {
-        recalculate_book($id);
-    }
 
-    // Fetch book details
-    $query = "SELECT title, page_count, series_name, language, summary, cover_art_url, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
-    $authQuery = "SELECT author FROM `IT202-S24-AUTHORS` WHERE book_id = :id";
-    $catsQuery = "SELECT category FROM `IT202-S24-CATEGORIES` WHERE book_id = :id";
+        // Fetch book details
+        $query = "SELECT title, page_count, series_name, language, summary, cover_art_url, is_api FROM `IT202-S24-BOOKS` WHERE id = :id";
+        $authQuery = "SELECT author FROM `IT202-S24-AUTHORS` WHERE book_id = :id";
+        $catsQuery = "SELECT category FROM `IT202-S24-CATEGORIES` WHERE book_id = :id";
 
-    try {
         $stmt = $db->prepare($query);
         $stmt->execute([":id" => $id]);
         $book = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -92,7 +75,7 @@ $is_api = $book['is_api'] ?? 0;
     <div>
         <a href="javascript:history.go(-1)" class="btn btn-secondary">Back</a>
         <?php if (has_role("Admin")) : ?>
-            <a href="<?php echo get_url("delete_book.php?id=" . $id); ?>" class="btn btn-danger">Delete</a>
+            <a href="<?php echo get_url("admin/delete_book.php?id=" . $id); ?>" class="btn btn-danger">Delete</a>
         <?php endif; ?>
         <div class="container text-center">
             <div class="row">

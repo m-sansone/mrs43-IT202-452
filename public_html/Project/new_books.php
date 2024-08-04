@@ -18,13 +18,15 @@ $form = [
 ];
 error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS` b WHERE b.id NOT IN (SELECT book_id FROM `IT202-S24-UserBooks` WHERE user_id = :user_id)", [":user_id" => $user_id]);
+// Update total_records query to match the books query
+$total_records = get_total_count("`IT202-S24-BOOKS` b LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id WHERE ub.book_id IS NULL", []);
 
 $query = "SELECT DISTINCT b.id, title, language, page_count, cover_art_url 
           FROM `IT202-S24-BOOKS` b
-          LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id AND ub.user_id = :user_id 
-          WHERE ub.user_id IS NULL";
-$params = [":user_id" => $user_id];
+          LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+          WHERE ub.book_id IS NULL";
+
+$params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
 if ($is_clear) {
@@ -113,7 +115,7 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>Search Undiscovered Books</h3>
+    <h2>Find Undiscovered Books</h2>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
         
@@ -125,7 +127,7 @@ if (has_role("Admin")) {
 
         </div>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
-        <a href="?clear" class="btn btn-secondary">Clear</a>
+        <a href="?clear" class="btn btn-secondary">Clear Filters</a>
         <?php render_result_counts(count($results), $total_records); ?>
     </form>
     <div class="row w-100 row-cols-auto row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">

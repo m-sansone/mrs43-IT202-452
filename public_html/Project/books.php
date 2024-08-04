@@ -2,6 +2,34 @@
 // Note we need to go up 1 more directory
 require(__DIR__ . "/../../partials/nav.php");
 
+// Check if there's a request to remove a book
+if (isset($_GET['remove_book']) && isset($_GET['book_id'])) {
+    $book_id = $_GET['book_id'];
+    $user_id = get_user_id(); // Get the current user ID
+
+    // Ensure that we have valid values
+    if (is_numeric($book_id) && is_numeric($user_id)) {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM `IT202-S24-UserBooks` WHERE book_id = :book_id AND user_id = :user_id");
+        $stmt->execute([
+            ':book_id' => $book_id,
+            ':user_id' => $user_id
+        ]);
+
+        // Check if the deletion was successful
+        if ($stmt->rowCount() > 0) {
+            flash("Book removed from your library.", "success");
+        } else {
+            flash("Failed to remove the book. It might not be in your library.", "danger");
+        }
+
+        // Redirect to the same page to refresh the results
+        redirect($_SERVER['SCRIPT_NAME']);
+    } else {
+        flash("Invalid book ID or user ID.", "danger");
+    }
+}
+
 // Build search form
 $form = [
     ["type" => "", "name" => "title", "placeholder" => "Title", "label" => "Title", "include_margin" => false],
@@ -122,7 +150,7 @@ if (has_role("Admin")) {
 }
 ?>
 <div class="container-fluid">
-    <h3>Explore Books</h3>
+    <h2>Explore Books</h2>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
             <?php foreach ($form as $k => $v) : ?>
@@ -132,7 +160,7 @@ if (has_role("Admin")) {
             <?php endforeach; ?>
         </div>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
-        <a href="?clear" class="btn btn-secondary">Clear</a>
+        <a href="?clear" class="btn btn-secondary">Clear Filters</a>
         <?php render_result_counts(count($results), $total_records); ?>
     </form>
     <div class="row w-100 row-cols-auto row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
