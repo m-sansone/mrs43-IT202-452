@@ -2,11 +2,9 @@
 // Note: we need to go up 1 more directory
 function fetch_quote($title)
 {
-
-    // Handle book fetch
     $result = [];
 
-    $data = ["title" => $title];
+    $data = ["title" => $title, "results_per_page" => 1, "page" => 1];
     $endpoint = "https://book-finder1.p.rapidapi.com/api/search";
     $isRapidAPI = true;
     $rapidAPIHost = "book-finder1.p.rapidapi.com";
@@ -21,16 +19,43 @@ function fetch_quote($title)
         foreach ($result['results'] as $book) {
             try {
                 // Check if book exists
-                $checkQuery = "SELECT COUNT(*) as count FROM `IT202-S24-BOOKS` WHERE title = :title";
+                $checkQuery = "SELECT id FROM `IT202-S24-BOOKS` WHERE title = :title";
                 $checkStmt = $db->prepare($checkQuery);
                 $checkStmt->execute([":title" => $book['title']]);
-                $count = $checkStmt->fetch(PDO::FETCH_ASSOC)["count"];
+                $existingBook = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
-                if ($count > 0) {
-                    flash("A book with this title already exists, please try another or edit it", "warning");
+                if ($existingBook) {
+                    // Update existing book
+                    $updateQuery = "UPDATE `IT202-S24-BOOKS` SET 
+                                    `page_count` = :page_count, 
+                                    `series_name` = :series_name, 
+                                    `language` = :language, 
+                                    `summary` = :summary, 
+                                    `cover_art_url` = :cover_art_url, 
+                                    `is_api` = 1, 
+                                    `modified` = CURRENT_TIMESTAMP 
+                                    WHERE `id` = :id";
+                    $updateStmt = $db->prepare($updateQuery);
+                    $params = [
+                        ":page_count" => $book['page_count'] ?? null,
+                        ":series_name" => $book['series_name'] ?? "N/A",
+                        ":language" => $book['language'] ?? "Unknown",
+                        ":summary" => $book['summary'] ?? "N/A",
+                        ":cover_art_url" => isset($book['published_works'][0]['cover_art_url']) ? $book['published_works'][0]['cover_art_url'] : null,
+                        ":id" => $existingBook['id']
+                    ];
+                    $updateStmt->execute($params);
+
+                    // Optionally update authors and categories
+                    // ...
+
+                    flash("Updated existing book: " . $book['title']);
                 } else {
-                    // Insert book details
-                    $query = "INSERT INTO `IT202-S24-BOOKS` (`title`, `page_count`, `series_name`, `language`, `summary`, `cover_art_url`, `is_api`) VALUES (:title, :page_count, :series_name, :language, :summary, :cover_art_url, :is_api)";
+                    // Insert new book
+                    $query = "INSERT INTO `IT202-S24-BOOKS` 
+                                (`title`, `page_count`, `series_name`, `language`, `summary`, `cover_art_url`, `is_api`) 
+                                VALUES 
+                                (:title, :page_count, :series_name, :language, :summary, :cover_art_url, :is_api)";
                     $stmt = $db->prepare($query);
                     $params = [
                         ":title" => $book['title'],
@@ -38,36 +63,16 @@ function fetch_quote($title)
                         ":series_name" => $book['series_name'] ?? "N/A",
                         ":language" => $book['language'] ?? "Unknown",
                         ":summary" => $book['summary'] ?? "N/A",
+                        ":cover_art_url" => isset($book['published_works'][0]['cover_art_url']) ? $book['published_works'][0]['cover_art_url'] : null,
                         ":is_api" => 1
                     ];
-
-                    if (isset($book['published_works']) && is_array($book['published_works'])) {
-                        $temp = $book['published_works'][0];
-                        $params[":cover_art_url"] = $temp["cover_art_url"];
-                    }
-
                     $stmt->execute($params);
                     $bookId = $db->lastInsertId();
 
-                    // Insert authors
-                    if (isset($book['authors']) && is_array($book['authors'])) {
-                        foreach ($book['authors'] as $author) {
-                            $query = "INSERT INTO `IT202-S24-AUTHORS` (`book_id`, `author`) VALUES (:book_id, :author)";
-                            $stmt = $db->prepare($query);
-                            $stmt->execute([":book_id" => $bookId, ":author" => $author]);
-                        }
-                    }
+                    // Insert authors and categories
+                    // ...
 
-                    // Insert categories
-                    if (isset($book['categories']) && is_array($book['categories'])) {
-                        foreach ($book['categories'] as $category) {
-                            $query = "INSERT INTO `IT202-S24-CATEGORIES` (`book_id`, `category`) VALUES (:book_id, :category)";
-                            $stmt = $db->prepare($query);
-                            $stmt->execute([":book_id" => $bookId, ":category" => $category]);
-                        }
-                    }
-
-                    flash("Entered new book");
+                    flash("Entered new book: " . $book['title']);
                 }
             } catch (PDOException $e) {
                 error_log("SQL Error: " . $e->getMessage());
