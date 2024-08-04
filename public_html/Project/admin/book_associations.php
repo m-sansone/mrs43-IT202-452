@@ -203,6 +203,7 @@ if (has_role("Admin")) {
                         </div>
                     </div>
                     <div class="card-footer">
+                        <a href="../book.php?id=<?= se($book['id'], null) ?>" class="btn btn-secondary">View</a>
                         <a class="btn btn-danger" href="?remove_connections=1&remove_book_id=<?php se($book, 'id'); ?>" onclick="return confirm('Are you sure?');">Remove</a>
                     </div>
                 </div>
