@@ -41,7 +41,10 @@ session_start();
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <?php if (is_logged_in()) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('home.php'); ?>">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('my_books.php'); ?>">My Library</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('profile.php'); ?>">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('books.php'); ?>">Explore Books</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?php echo get_url('new_books.php'); ?>">Find Undiscovered Books</a></li>
                 <?php endif; ?>
                 <?php if (!is_logged_in()) : ?>
                     <li class="nav-item"><a class="nav-link" href="<?php echo get_url('login.php'); ?>">Login</a></li>
@@ -50,7 +53,7 @@ session_start();
                 <?php if (has_role("Admin")) : ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                           Admin
+                           Roles
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/create_role.php'); ?>">Create Role</a></li>
@@ -65,6 +68,16 @@ session_start();
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/list_books.php'); ?>">List Books</a></li>
                             <li><a class="dropdown-item" href="<?php echo get_url('admin/create_book.php'); ?>">Enter Book</a></li>
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/fetch_book.php'); ?>">Fetch Book</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                           Data Management
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/book_associations.php'); ?>">All Connections</a></li>
+                            <li><a class="dropdown-item" href="<?php echo get_url('admin/associate_books.php'); ?>">Manage User Libraries</a></li>
                         </ul>
                     </li>
                 <?php endif; ?>
