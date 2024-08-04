@@ -209,6 +209,11 @@ if (has_role("Admin")) {
                 </div>
             </div>
         <?php endforeach; ?>
+        <?php if (count($results) === 0) : ?>
+            <div class="col">
+                No results
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php
