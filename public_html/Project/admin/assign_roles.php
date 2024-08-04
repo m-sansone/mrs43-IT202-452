@@ -4,7 +4,7 @@ require(__DIR__ . "/../../../partials/nav.php");
 
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
-    die(header("Location: $BASE_PATH" . "/home.php"));
+    redirect("home.php");
 }
 //attempt to apply
 if (isset($_POST["users"]) && isset($_POST["roles"])) {
@@ -72,7 +72,7 @@ if (isset($_POST["username"])) {
 
 ?>
 <div class="container-fluid">
-    <h1>Assign Roles</h1>
+    <h2>Assign Roles</h2>
     <form method="POST">
         <?php render_input(["type" => "search", "name" => "username", "placeholder" => "Username Search", "value" => $username]);/*lazy value to check if form submitted, not ideal*/ ?>
         <?php render_button(["text" => "Search", "type" => "submit"]); ?>

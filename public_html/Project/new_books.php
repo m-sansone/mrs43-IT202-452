@@ -1,45 +1,12 @@
 <?php
 // Note we need to go up 1 more directory
-require(__DIR__ . "/../../../partials/nav.php");
+require(__DIR__ . "/../../partials/nav.php");
 
-if (!has_role("Admin")) {
-    flash("You don't have permission to view this page", "warning");
-    redirect("home.php");
+// Ensure user is authenticated and user_id is available
+if (!is_logged_in()) {
+    redirect("login.php");
 }
-
-// Define the get_total_count function if not already defined
-if (!function_exists('get_total_count')) {
-    function get_total_count($table_refs, $params = []) {
-        $table_refs = preg_replace('/[^a-zA-Z0-9_\-.`\s=:()]/', '', $table_refs);
-        error_log("Table refs $table_refs");
-        error_log("Params: " . var_export($params, true));
-        foreach ($params as $k => $v) {
-            if (!str_starts_with($k, ":")) {
-                $params[":$k"] = $v;
-                unset($params[$k]);
-            }
-        }
-        $query = "SELECT COUNT(DISTINCT b.id) as totalCount FROM $table_refs";
-        try {
-            $db = getDB();
-            $stmt = $db->prepare($query);
-            foreach ($params as $key => $value) {
-                $stmt->bindValue("$key", $value);
-                error_log("Binding value for $key: $value");
-            }
-            $stmt->execute();
-            $r = $stmt->fetch();
-            if ($r) {
-                return (int)$r["totalCount"];
-            }
-            return 0;
-        } catch (PDOException $e) {
-            error_log("Error getting count for " . var_export($query, true) . ": " . var_export($e, true));
-            flash("Error getting count", "danger");
-        }
-        return -1;
-    }
-}
+$user_id = get_user_id(); // This function should retrieve the currently authenticated user's ID
 
 // Build search form
 $form = [
@@ -47,13 +14,18 @@ $form = [
     ["type" => "text", "name" => "language", "placeholder" => "Language", "label" => "Language", "include_margin" => false],
     ["type" => "select", "name" => "sort", "label" => "Sort", "options" => ["title" => "Title", "page_count" => "Number of Pages", "language" => "Language"], "include_margin" => false],
     ["type" => "select", "name" => "order", "label" => "Order", "options" => ["asc" => "+", "desc" => "-"], "include_margin" => false],
-    ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false],
+    ["type" => "number", "name" => "limit", "label" => "Limit", "value" => "10", "include_margin" => false]
 ];
 error_log("Form data: " . var_export($form, true));
 
-$total_records = get_total_count("`IT202-S24-BOOKS` b");
+// Update total_records query to match the books query
+$total_records = get_total_count("`IT202-S24-BOOKS` b LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id WHERE ub.book_id IS NULL", []);
 
-$query = "SELECT id, title, language, page_count FROM `IT202-S24-BOOKS` WHERE 1=1";
+$query = "SELECT DISTINCT b.id, title, language, page_count, cover_art_url 
+          FROM `IT202-S24-BOOKS` b
+          LEFT JOIN `IT202-S24-UserBooks` ub ON b.id = ub.book_id
+          WHERE ub.book_id IS NULL";
+
 $params = [];
 $session_key = $_SERVER["SCRIPT_NAME"];
 $is_clear = isset($_GET["clear"]);
@@ -79,7 +51,7 @@ if (count($_GET) > 0) {
             $form[$k]["value"] = $_GET[$v["name"]];
         }
     }
-    
+
     //title
     $title = se($_GET, "title", "", false);
     if (!empty($title)) {
@@ -98,6 +70,10 @@ if (count($_GET) > 0) {
     $sort = se($_GET, "sort", "title", false);
     if (!in_array($sort, ["title", "page_count", "language"])) {
         $sort = "title";
+    }
+    //tell mysql I care about the data from table "b"
+    if ($sort === "created" || $sort === "modified") {
+        $sort = "b." . $sort;
     }
     $order = se($_GET, "order", "desc", false);
     if (!in_array($order, ["asc", "desc"])) {
@@ -132,17 +108,17 @@ try {
     flash("Unhandled error occurred", "danger");
 }
 
-$table = ["data" => $results, "title" => "Latest Searched Books", "ignored_columns" => ["id"], "view_url" => get_url("admin/view_book.php")];
+$table = ["data" => $results, "title" => "Libraries", "ignored_columns" => ["id"], "view_url" => get_url("view_book.php")];
 if (has_role("Admin")) {
-    $table["edit_url"] = get_url("admin/edit_books.php");
-    $table["delete_url"] = get_url("admin/delete_book.php");
+    $table["edit_url"] = get_url("edit_book.php");
+    $table["delete_url"] = get_url("delete_book.php");
 }
 ?>
 <div class="container-fluid">
-    <h2>List Books</h2>
+    <h2>Find Undiscovered Books</h2>
     <form method="GET">
         <div class="row mb-3" style="align-items: flex-end;">
-
+        
             <?php foreach ($form as $k => $v) : ?>
                 <div class="col">
                     <?php render_input($v); ?>
@@ -151,13 +127,24 @@ if (has_role("Admin")) {
 
         </div>
         <?php render_button(["text" => "Search", "type" => "submit", "text" => "Filter"]); ?>
-        <a href="?clear" class="btn btn-secondary">Clear</a>
+        <a href="?clear" class="btn btn-secondary">Clear Filters</a>
+        <?php render_result_counts(count($results), $total_records); ?>
     </form>
-    <?php render_result_counts(count($results), $total_records); ?>
-    <?php render_table($table); ?>
+    <div class="row w-100 row-cols-auto row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+        <?php foreach ($results as $book) : ?>
+            <div class="col">
+                <?php render_book_card($book); ?>
+            </div>
+        <?php endforeach; ?>
+        <?php if (count($results) === 0) : ?>
+            <div class="col">
+                No results
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <?php
 // Note we need to go up 1 more directory
-require_once(__DIR__ . "/../../../partials/flash.php");
+require_once(__DIR__ . "/../../partials/flash.php");
 ?>
